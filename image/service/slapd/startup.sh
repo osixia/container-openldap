@@ -323,9 +323,6 @@ EOF
 
       log-helper info "Add bootstrap schemas..."
 
-      # add ppolicy schema
-      ldapadd -c -Y EXTERNAL -Q -H ldapi:/// -f /etc/ldap/schema/ppolicy.ldif 2>&1 | log-helper debug
-
       # convert schemas to ldif
       SCHEMAS=""
       for f in $(find ${CONTAINER_SERVICE_DIR}/slapd/assets/config/bootstrap/schema -name \*.schema -type f|sort); do
