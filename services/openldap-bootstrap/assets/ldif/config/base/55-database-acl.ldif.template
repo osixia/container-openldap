@@ -1,0 +1,10 @@
+olcAccess: to *
+  by dn.exact="gidNumber=${OPENLDAP_GROUP_GID}+uidNumber=${OPENLDAP_USER_UID},cn=peercred,cn=external,cn=auth" manage
+  by * break
+olcAccess: to attrs=userPassword,shadowLastChange
+  by self write
+  by anonymous auth
+  by * break
+olcAccess: to attrs=cn,sn,givenName,mail,uid
+  by self read
+  by * break
