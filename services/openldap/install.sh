@@ -1,0 +1,30 @@
+#!/bin/bash -e
+
+# if container log level is trace:
+# print commands and their arguments as they are executed
+container log level eq trace && set -x
+
+set -o pipefail
+
+container log info "Setting container files ownership to ldap user ..."
+chown ldap:ldap -R /container
+
+container log info "Copy OpenLDAP container modules to /usr/lib/openldap ..."
+cp -frav /container/services/openldap/assets/module/. /usr/lib/openldap 2>&1 | container log debug
+
+container log info "Copy OpenLDAP container schemas to ..."
+cp -frav /container/services/openldap/assets/schema/. /etc/openldap/schema 2>&1 | container log debug
+
+container log info "Creating default config directory /etc/openldap/slapd.d ..."
+mkdir -p /etc/openldap/slapd.d
+chown ldap:ldap /etc/openldap/slapd.d
+chmod 700 /etc/openldap/slapd.d
+
+container log info "Creating default backup directory /var/lib/openldap/openldap-backups ..."
+mkdir -p /var/lib/openldap/openldap-backups
+chown ldap:ldap /var/lib/openldap/openldap-backups
+chmod 700 /var/lib/openldap/openldap-backups
+
+container log info "Creating default ldapi socket directory ..."
+mkdir -p /var/lib/openldap/run
+chown -R ldap:ldap /var/lib/openldap/run

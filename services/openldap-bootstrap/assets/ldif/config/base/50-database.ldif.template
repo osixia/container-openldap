@@ -1,0 +1,16 @@
+dn: olcDatabase=mdb,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcMdbConfig
+olcDatabase: mdb
+olcDbDirectory: ${OPENLDAP_DATA_DIR}
+olcSuffix: ${OPENLDAP_BOOTSTRAP_SUFFIX}
+olcRootDN: ${OPENLDAP_BOOTSTRAP_DATA_ROOT_DN}
+olcRootPW: ${OPENLDAP_BOOTSTRAP_DATA_ROOT_PASSWORD_HASHED}
+olcDbMaxSize: ${OPENLDAP_BOOTSTRAP_DATA_DATABASE_MAX_SIZE}
+olcDbIndex: objectClass eq
+olcDbIndex: uid eq
+olcDbIndex: mail eq
+olcDbIndex: cn,sn,givenName eq,sub
+olcDbIndex: member,uniqueMember eq
+olcDbIndex: entryCSN eq
+olcDbIndex: entryUUID eq
