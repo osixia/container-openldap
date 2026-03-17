@@ -1,0 +1,39 @@
+# AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.
+# CRC32 e21a2871
+dn: cn=virtualMail,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: virtualMail
+olcAttributeTypes: {0}( 1.3.6.1.4.1.53373.2.1.100 NAME 'mailHomeDirectory' DES
+ C 'The absolute path to the mail user home directory' EQUALITY caseExactIA5Ma
+ tch SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+olcAttributeTypes: {1}( 1.3.6.1.4.1.53373.2.1.101 NAME 'mailAlias' DESC 'RFC82
+ 2 Mailbox - mail alias' EQUALITY caseIgnoreIA5Match SUBSTR caseIgnoreIA5Subst
+ ringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+olcAttributeTypes: {2}( 1.3.6.1.4.1.53373.2.1.102 NAME 'mailDrop' DESC 'Postfi
+ x mail final destination attribute' EQUALITY caseIgnoreIA5Match SUBSTR caseIg
+ noreIA5SubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+olcAttributeTypes: {3}( 1.3.6.1.4.1.53373.2.1.103 NAME 'mailUidNumber' DESC 'U
+ ID required to access the mailbox' EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1
+ 466.115.121.1.27 SINGLE-VALUE )
+olcAttributeTypes: {4}( 1.3.6.1.4.1.53373.2.1.104 NAME 'mailGidNumber' DESC 'G
+ ID required to access the mailbox' EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1
+ 466.115.121.1.27 SINGLE-VALUE )
+olcAttributeTypes: {5}( 1.3.6.1.4.1.53373.2.1.105 NAME 'mailEnabled' DESC 'TRU
+ E to enable, FALSE to disable account' EQUALITY booleanMatch SYNTAX 1.3.6.1.4
+ .1.1466.115.121.1.7 SINGLE-VALUE )
+olcAttributeTypes: {6}( 1.3.6.1.4.1.53373.2.1.106 NAME 'mailQuota' DESC 'Mail 
+ quota limit in kilobytes' EQUALITY caseExactIA5Match SYNTAX 1.3.6.1.4.1.1466.
+ 115.121.1.26 )
+olcAttributeTypes: {7}( 1.3.6.1.4.1.53373.2.1.107 NAME 'mailGroupACL' DESC 'AC
+ L group attribute' EQUALITY caseExactIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121
+ .1.26 SINGLE-VALUE )
+olcAttributeTypes: {8}( 1.3.6.1.4.1.53373.2.1.108 NAME 'mailExpungeTrash' DESC
+  'Time to automatically expunge Trash mailbox' EQUALITY caseExactIA5Match SYN
+ TAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+olcAttributeTypes: {9}( 1.3.6.1.4.1.53373.2.1.109 NAME 'mailAlternate' DESC 'M
+ ailbox hosted externally' EQUALITY caseIgnoreIA5Match SUBSTR caseIgnoreIA5Sub
+ stringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+olcObjectClasses: {0}( 1.3.6.1.4.1.53373.2.2.100 NAME 'mailUser' DESC 'Hosted 
+ mail user class' SUP top AUXILIARY MAY ( mailHomeDirectory $ mailAlias $ mail
+ Drop $ mailUidNumber $ mailGidNumber $ mailEnabled $ mailQuota $ mailGroupACL
+  $ mailExpungeTrash $ mailAlternate ) )

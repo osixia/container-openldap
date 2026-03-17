@@ -1,0 +1,6 @@
+dn: ${OPENLDAP_BOOTSTRAP_MONITOR_READONLY_DN}
+objectClass: top
+objectClass: organizationalRole
+objectClass: simpleSecurityObject
+cn: ${OPENLDAP_BOOTSTRAP_MONITOR_READONLY_CN}
+userPassword: ${OPENLDAP_BOOTSTRAP_MONITOR_READONLY_PASSWORD_HASHED}

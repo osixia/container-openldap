@@ -1,0 +1,5 @@
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulepath: ${OPENLDAP_MODULES_DIR}
+${OPENLDAP_BOOTSTRAP_MODULES_LDIF}
