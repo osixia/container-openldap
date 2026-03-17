@@ -1,0 +1,5 @@
+dn: olcDatabase={-1}frontend,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcFrontendConfig
+olcDatabase: {-1}frontend
+olcPasswordHash: ${OPENLDAP_BOOTSTRAP_FRONTEND_PASSWORD_HASH}

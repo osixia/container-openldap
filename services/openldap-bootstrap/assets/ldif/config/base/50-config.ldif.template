@@ -1,0 +1,5 @@
+dn: olcDatabase={0}config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {0}config
+olcRootDN: ${OPENLDAP_BOOTSTRAP_CONFIG_ROOT_DN}
+olcRootPW: ${OPENLDAP_BOOTSTRAP_CONFIG_ROOT_PASSWORD_HASHED}
