@@ -1,0 +1,9 @@
+dn: olcOverlay=memberof,olcDatabase={1}mdb,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcMemberOfConfig
+olcOverlay: memberof
+olcMemberOfGroupOC: ${OPENLDAP_BOOTSTRAP_MEMBEROF_GROUP_OC}
+olcMemberOfMemberAD: ${OPENLDAP_BOOTSTRAP_MEMBEROF_MEMBER_AD}
+olcMemberOfMemberOfAD: ${OPENLDAP_BOOTSTRAP_MEMBEROF_MEMBEROF_AD}
+olcMemberOfAddCheck: ${OPENLDAP_BOOTSTRAP_MEMBEROF_ADD_CHECK}
+olcMemberOfDangling: ${OPENLDAP_BOOTSTRAP_MEMBEROF_DANGLING}

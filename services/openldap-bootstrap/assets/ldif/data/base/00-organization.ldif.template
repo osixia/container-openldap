@@ -1,0 +1,6 @@
+dn: ${OPENLDAP_BOOTSTRAP_SUFFIX}
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+dc: ${OPENLDAP_BOOTSTRAP_ORGANIZATION_DC}
+o: ${OPENLDAP_BOOTSTRAP_ORGANIZATION}

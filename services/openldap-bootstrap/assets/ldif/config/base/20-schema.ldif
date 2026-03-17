@@ -1,0 +1,3 @@
+dn: cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: schema

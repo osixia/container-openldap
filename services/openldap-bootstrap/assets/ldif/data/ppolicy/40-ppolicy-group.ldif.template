@@ -1,0 +1,4 @@
+dn: ${OPENLDAP_BOOTSTRAP_PPOLICY_GROUP_DN}
+ou: ${OPENLDAP_BOOTSTRAP_PPOLICY_GROUP_OU}
+objectClass: top
+objectClass: organizationalUnit

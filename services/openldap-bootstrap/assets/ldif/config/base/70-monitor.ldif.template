@@ -1,0 +1,4 @@
+dn: olcDatabase=monitor,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: monitor
+olcMonitoring: ${OPENLDAP_BOOTSTRAP_MONITOR_ENABLED}

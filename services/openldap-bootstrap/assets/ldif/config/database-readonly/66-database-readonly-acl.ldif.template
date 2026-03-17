@@ -1,0 +1,6 @@
+olcAccess: to attrs=userPassword,shadowLastChange
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_READONLY_DN}" none
+  by * break
+olcAccess: to *
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_READONLY_DN}" read
+  by * break

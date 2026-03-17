@@ -1,0 +1,74 @@
+name: osixia
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25'
+          cache: false
+      - name: golangci-lint build
+        uses: golangci/golangci-lint-action@v9
+        with:
+          working-directory: build
+
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+
+  govulncheck:
+    name: govulncheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: govulncheck build
+        uses: golang/govulncheck-action@v1
+        with:
+          work-dir: build
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    needs: [lint, shellcheck, govulncheck]
+    permissions:
+      contents: write
+      id-token: write
+    env:
+      DIGESTS_FILE: ${{ github.workspace }}/digests.txt
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25'
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v4
+      - name: Install syft
+        uses: anchore/sbom-action/download-syft@v0
+      - name: Vendor build go dependencies
+        run: |
+          cd build
+          go mod vendor
+      - name: Run pipeline
+        run: |
+          cd build
+          go run main.go provider github ../Dockerfile --github-ref "${GITHUB_REF}" --github-token "${{ secrets.GITHUB_TOKEN }}" --changelog ../CHANGELOG.md --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}" --digests-file "${DIGESTS_FILE}" ${{ vars.OSX_GITHUB_FLAGS }}
+      - name: Sign images and generate SBOM
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
+          while IFS= read -r ref; do
+            cosign sign --yes --registry-referrers-mode=oci-1-1 "${ref}"
+            syft "${ref}" -o spdx-json > sbom.spdx.json
+            cosign attest --yes --registry-referrers-mode=oci-1-1 --predicate sbom.spdx.json --type spdx "${ref}"
+          done < "${DIGESTS_FILE}"

@@ -1,0 +1,3 @@
+olcAccess: to *
+  by dn.exact="gidNumber=${OPENLDAP_GROUP_GID}+uidNumber=${OPENLDAP_USER_UID},cn=peercred,cn=external,cn=auth" manage
+  by * break

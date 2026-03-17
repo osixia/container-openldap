@@ -1,0 +1,50 @@
+services:
+  ldap1:
+    image: osixia/openldap
+    container_name: ldap1
+    hostname: ldap1.example.org
+    networks:
+      - openldap-net
+    ports:
+      - "389:3890"
+      - "636:6360"
+    environment:
+      OPENLDAP_URLS: "ldap://ldap1.example.org:3890 ldaps://ldap1.example.org:6360 ldapi:///"
+      OPENLDAP_BOOTSTRAP_ORGANIZATION: "Keycloakers Org"
+      OPENLDAP_BOOTSTRAP_SUFFIX: "dc=keycloakers,dc=org"
+      OPENLDAP_BOOTSTRAP_REPLICATION: "true"
+      OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS: "ldap://ldap1.example.org:3890 ldap://ldap2.example.org:3890"
+      OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD: "passw0rd"
+    volumes:
+      - ldap1-conf:/etc/openldap/slapd.d
+      - ldap1-data:/var/lib/openldap/openldap-data
+      - ldap1-backups:/var/lib/openldap/openldap-backups
+
+  ldap2:
+    image: osixia/openldap
+    container_name: ldap2
+    hostname: ldap2.example.org
+    networks:
+      - openldap-net
+    environment:
+      OPENLDAP_URLS: "ldap://ldap2.example.org:3890 ldaps://ldap2.example.org:6360 ldapi:///"
+      OPENLDAP_BOOTSTRAP_ORGANIZATION: "Keycloakers Org"
+      OPENLDAP_BOOTSTRAP_SUFFIX: "dc=keycloakers,dc=org"
+      OPENLDAP_BOOTSTRAP_REPLICATION: "true"
+      OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS: "ldap://ldap1.example.org:3890 ldap://ldap2.example.org:3890"
+      OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD: "passw0rd"
+    volumes:
+      - ldap2-conf:/etc/openldap/slapd.d
+      - ldap2-data:/var/lib/openldap/openldap-data
+      - ldap2-backups:/var/lib/openldap/openldap-backups
+
+networks:
+  openldap-net:
+
+volumes:
+  ldap1-conf:
+  ldap1-data:
+  ldap1-backups:
+  ldap2-conf:
+  ldap2-data:
+  ldap2-backups:

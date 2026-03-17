@@ -1,0 +1,80 @@
+# TOTP/MFA LDAP Schema
+#
+# This schema adds attributes and object classes for storing TOTP secrets
+# and managing MFA enforcement policies in LDAP.
+#
+# Structure:
+#   1.3.6.1.4.1.64419.1.1.x = Attribute Types
+#   1.3.6.1.4.1.64419.1.2.x = Object Classes
+
+dn: cn=totp,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: totp
+#
+# Attribute Types
+#
+# totpSecret - The TOTP shared secret (Base32 encoded)
+olcAttributeTypes: ( 1.3.6.1.4.1.64419.1.1.1
+  NAME 'totpSecret'
+  DESC 'TOTP shared secret key (Base32 encoded, e.g., JBSWY3DPEHPK3PXP)'
+  EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
+#
+# totpScratchCode - Backup/recovery codes (multi-valued)
+olcAttributeTypes: ( 1.3.6.1.4.1.64419.1.1.2
+  NAME 'totpScratchCode'
+  DESC 'TOTP backup/scratch code for emergency access (8 digits)'
+  EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+#
+# totpEnrolledDate - When the user enrolled in MFA
+olcAttributeTypes: ( 1.3.6.1.4.1.64419.1.1.3
+  NAME 'totpEnrolledDate'
+  DESC 'Date and time when TOTP was enrolled (GeneralizedTime format)'
+  EQUALITY generalizedTimeMatch
+  ORDERING generalizedTimeOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+  SINGLE-VALUE )
+#
+# totpStatus - Current MFA enrollment status
+olcAttributeTypes: ( 1.3.6.1.4.1.64419.1.1.4
+  NAME 'totpStatus'
+  DESC 'TOTP enrollment status: none, pending, active, disabled, bypassed'
+  EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
+#
+# mfaRequired - Boolean flag for group-level MFA requirement
+olcAttributeTypes: ( 1.3.6.1.4.1.64419.1.1.5
+  NAME 'mfaRequired'
+  DESC 'Boolean flag indicating MFA is required for this group'
+  EQUALITY booleanMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+  SINGLE-VALUE )
+#
+# mfaGracePeriodDays - Grace period before MFA is enforced
+olcAttributeTypes: ( 1.3.6.1.4.1.64419.1.1.6
+  NAME 'mfaGracePeriodDays'
+  DESC 'Number of days users have to set up MFA after account creation'
+  EQUALITY integerMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+  SINGLE-VALUE )
+#
+# Object Classes
+#
+# totpUser - Auxiliary class for users with TOTP/MFA
+olcObjectClasses: ( 1.3.6.1.4.1.64419.1.2.1
+  NAME 'totpUser'
+  DESC 'User with TOTP/MFA authentication capability'
+  SUP top
+  AUXILIARY
+  MAY ( totpSecret $ totpScratchCode $ totpEnrolledDate $ totpStatus ) )
+#
+# mfaGroup - Auxiliary class for groups with MFA policies
+olcObjectClasses: ( 1.3.6.1.4.1.64419.1.2.2
+  NAME 'mfaGroup'
+  DESC 'Group with MFA enforcement policy'
+  SUP top
+  AUXILIARY
+  MAY ( mfaRequired $ mfaGracePeriodDays ) )
