@@ -1,586 +1,464 @@
-# Deprecation Notice for Version 1
+# osixia/openldap 🐳🪪🌴
 
-After many years of v1 being used in production by so many people (thank you 🙏), it’s time to move forward.
+[docker hub]: https://hub.docker.com/r/osixia/openldap
+[github]: https://github.com/osixia/container-openldap
 
-The v1 branch is now officially deprecated and will no longer receive updates or fixes.
+[![Docker Pulls](https://img.shields.io/docker/pulls/osixia/openldap.svg?style=flat-square)][docker hub]
+[![Docker Stars](https://img.shields.io/docker/stars/osixia/openldap.svg?style=flat-square)][docker hub]
+[![GitHub Stars](https://img.shields.io/github/stars/osixia/container-openldap?label=github%20stars&style=flat-square)][github]
+[![Contributors](https://img.shields.io/github/contributors/osixia/container-openldap?style=flat-square)](https://github.com/osixia/container-openldap/graphs/contributors)
 
-If currently using v1, please consider starting the migration process and take a look at v2 here: 👉 https://github.com/osixia/container-openldap/tree/develop
+[OpenLDAP](https://www.openldap.org/) container image with built-in bootstrap, TLS, replication, backup helpers, and upgrade support.
 
-Version 2 brings a more flexible and easier-to-customize configuration, and takes advantage of the latest improvements in the [osixia baseimage](https://github.com/osixia/container-baseimage/tree/develop) to provide a cleaner and more robust foundation.
+> ⚠️ WARNING
+> **v2 is a breaking release.** Existing v1 deployments are **not** migrated automatically and require a **manual migration** to move to v2.
+> Automatic upgrade paths are intended only between future v2 versions (for example, v2.x to v2.y).
 
-Feedback, testing, ideas, and contributions are always welcome. Thank you for being part of the community ❤️
+110M+ pulls 🎉 Thanks to everyone using, testing, reporting issues, and contributing to this image. 🙏
 
-# osixia/openldap
+![osixia/openldap logo.](./docs/assets/images/osixia-container-openldap.png)
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/osixia/openldap.svg)](https://hub.docker.com/r/osixia/openldap/)
-[![Docker Stars](https://img.shields.io/docker/stars/osixia/openldap.svg)](https://hub.docker.com/r/osixia/openldap/)
+- [osixia/openldap 🐳🪪🌴](#osixiaopenldap-)
+  - [⚡ Quickstart](#-quickstart)
+  - [🛟 Backup / Restore](#-backup--restore)
+  - [🔐 TLS](#-tls)
+  - [🔁 Replication](#-replication)
+  - [🛠️ LDAP Toolkit](#️-ldap-toolkit)
+    - [OpenLDAP Utilities](#openldap-utilities)
+    - [Password Helpers](#password-helpers)
+    - [Convert Schema to LDIF](#convert-schema-to-ldif)
+  - [🔤 Environment Variables](#-environment-variables)
+  - [📄 Documentation](#-documentation)
+  - [🔀 Contributing](#-contributing)
+  - [🔓 License](#-license)
 
-Latest release: 1.5.0 - [OpenLDAP 2.4.57](https://www.openldap.org/software/release/changes.html) -  [Changelog](CHANGELOG.md) | [Docker Hub](https://hub.docker.com/r/osixia/openldap/) 
+## ⚡ Quickstart
 
-**A docker image to run OpenLDAP.**
+Run a basic OpenLDAP server:
 
-> OpenLDAP website : [www.openldap.org](https://www.openldap.org/)
-
-
-- [osixia/openldap](#osixiaopenldap)
-	- [Contributing](#contributing)
-	- [Quick Start](#quick-start)
-	- [Beginner Guide](#beginner-guide)
-		- [Create new ldap server](#create-new-ldap-server)
-			- [Data persistence](#data-persistence)
-			- [Edit your server configuration](#edit-your-server-configuration)
-			- [Seed ldap database with ldif](#seed-ldap-database-with-ldif)
-			- [Seed from internal path](#seed-from-internal-path)
-		- [Use an existing ldap database](#use-an-existing-ldap-database)
-		- [Backup](#backup)
-		- [Administrate your ldap server](#administrate-your-ldap-server)
-		- [TLS](#tls)
-			- [Use auto-generated certificate](#use-auto-generated-certificate)
-			- [Use your own certificate](#use-your-own-certificate)
-			- [Disable TLS](#disable-tls)
-		- [Multi master replication](#multi-master-replication)
-		- [Fix docker mounted file problems](#fix-docker-mounted-file-problems)
-		- [Debug](#debug)
-	- [Environment Variables](#environment-variables)
-		- [Default.yaml](#defaultyaml)
-		- [Default.startup.yaml](#defaultstartupyaml)
-		- [Set your own environment variables](#set-your-own-environment-variables)
-			- [Use command line argument](#use-command-line-argument)
-			- [Link environment file](#link-environment-file)
-			- [Docker Secrets](#docker-secrets)
-			- [Make your own image or extend this image](#make-your-own-image-or-extend-this-image)
-	- [Advanced User Guide](#advanced-user-guide)
-		- [Extend osixia/openldap:1.5.0 image](#extend-osixiaopenldap150-image)
-		- [Make your own openldap image](#make-your-own-openldap-image)
-		- [Tests](#tests)
-		- [Kubernetes](#kubernetes)
-		- [Under the hood: osixia/light-baseimage](#under-the-hood-osixialight-baseimage)
-	- [Security](#security)
-		- [Known security issues](#known-security-issues)
-	- [Changelog](#changelog)
-
-## Contributing
-
-If you find this image useful here's how you can help:
-
-- Send a pull request with your kickass new features and bug fixes
-- Help new users with [issues](https://github.com/osixia/docker-openldap/issues) they may encounter
-- Support the development of this image and star this repo !
-
-## Quick Start
-Run OpenLDAP docker image:
-
-```sh
-docker run --name my-openldap-container --detach osixia/openldap:1.5.0
+```bash
+docker run --name openldap --hostname ldap.example.org -p 389:3890 -p 636:6360 \
+  -e OPENLDAP_BOOTSTRAP_ORGANIZATION="Keycloakers Org" \
+  -e OPENLDAP_BOOTSTRAP_SUFFIX="dc=keycloakers,dc=org" \
+  osixia/openldap
 ```
 
-Do not forget to add the port mapping for both port 389 and 636 if you wish to access the ldap server from another machine.
+For persistent deployments, mount config, data, and backup directories:
 
-```sh
-docker run -p 389:389 -p 636:636 --name my-openldap-container --detach osixia/openldap:1.5.0
+```bash
+docker run --name openldap --hostname ldap.example.org -p 389:3890 -p 636:6360 \
+  -e OPENLDAP_BOOTSTRAP_ORGANIZATION="Keycloakers Org" \
+  -e OPENLDAP_BOOTSTRAP_SUFFIX="dc=keycloakers,dc=org" \
+  -v openldap-conf:/etc/openldap/slapd.d \
+  -v openldap-data:/var/lib/openldap/openldap-data \
+  -v openldap-backups:/var/lib/openldap/openldap-backups \
+  osixia/openldap
 ```
 
-Either command starts a new container with OpenLDAP running inside. Let's make the first search in our LDAP container:
+Notes:
+- Default internal listener ports are `3890` (LDAP) and `6360` (LDAPS), as defined by `OPENLDAP_URLS`.
+- On first start, passwords are generated if hashed values are empty and printed in logs.
+- Bootstrap runs only when config/data are empty.
 
-```sh
-docker exec my-openldap-container ldapsearch -x -H ldap://localhost -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w admin
+**Verify the server is up**
+
+Retrieve the generated admin password from the container logs:
+
+``` bash
+docker logs openldap 2>&1 | grep -i password
 ```
 
-This should output:
+Then search the base DN to confirm the server is responding:
 
-	# extended LDIF
-	#
-	# LDAPv3
-	# base <dc=example,dc=org> with scope subtree
-	# filter: (objectclass=*)
-	# requesting: ALL
-	#
-
-	[...]
-
-	# numResponses: 3
-	# numEntries: 2
-
-If you have the following error, OpenLDAP is not started yet, maybe you are too fast or maybe your computer is too slow, as you want... but wait for some time before retrying.
-
-		ldap_sasl_bind(SIMPLE): Can't contact LDAP server (-1)
-
-
-## Beginner Guide
-
-### Create new ldap server
-
-This is the default behavior when you run this image.
-It will create an empty ldap for the company **Example Inc.** and the domain **example.org**.
-
-By default the admin has the password **admin**. All those default settings can be changed at the docker command line, for example:
-
-```sh
-docker run \
-	--env LDAP_ORGANISATION="My Company" \
-	--env LDAP_DOMAIN="my-company.com" \
-	--env LDAP_ADMIN_PASSWORD="JonSn0w" \
-	--detach osixia/openldap:1.5.0
+``` bash
+docker exec openldap container run -- \
+  ldapsearch -H ldap://localhost:3890 \
+  -D "cn=admin,dc=keycloakers,dc=org" -w <database root password> \
+  -b "dc=keycloakers,dc=org" "(objectClass=*)"
 ```
 
-#### Data persistence
+A successful response returns the organization entry and the `cn=admin` account.
 
-The directories `/var/lib/ldap` (LDAP database files) and `/etc/ldap/slapd.d`  (LDAP config files) are used to persist the schema and data information, and should be mapped as volumes, so your ldap files are saved outside the container (see [Use an existing ldap database](#use-an-existing-ldap-database)). However it can be useful to not use volumes,
-in case the image should be delivered complete with test data - this is especially useful when deriving other images from this one.
+**Passing command-line arguments to OpenLDAP**
 
-The default uid and gid used by the image may map to surprising
-counterparts in the host. If you need to match uid and gid in the
-container and in the host, you can use build parameters
-`LDAP_OPENLDAP_UID` and `LDAP_OPENLDAP_GID` to set uid and gid
-explicitly:
+The `osixia/openldap` container allows you to pass additional command-line arguments directly to the OpenLDAP binary.
 
-```sh
-docker build \
-	--build-arg LDAP_OPENLDAP_GID=1234 \
-	--build-arg LDAP_OPENLDAP_UID=2345 \
-	-t my_ldap_image .
-docker run --name my_ldap_container -d my_ldap_image
-# this should output uid=2345(openldap) gid=1234(openldap) groups=1234(openldap)
-docker exec my_ldap_container id openldap
+Arguments specified after `--` are forwarded to the slapd process inside the container:
+
+``` bash
+docker run osixia/openldap -- -d -1
 ```
 
-For more information about docker data volume, please refer to:
+**Debugging**
 
-> [https://docs.docker.com/engine/tutorials/dockervolumes/](https://docs.docker.com/engine/tutorials/dockervolumes/)
+To debug the container manually, you can start it with an interactive shell.
 
-#### Firewall issues on RHEL/CentOS
-Docker Engine doesn't work well with firewall-cmd and can cause issues if you're connecting to the LDAP server from another container on the same machine. You can fix this by running:
-```sh
-$ firewall-cmd --add-port=389/tcp --permanent
-$ firewall-cmd --add-port=636/tcp --permanent
-$ firewall-cmd --reload
-```
-Learn more about this issue at https://github.com/moby/moby/issues/32138
+The `--log-level debug --bash` options from `osixia/baseimage` enables debug logging and launches an interactive shell.
 
-#### Edit your server configuration
+If OpenLDAP keeps crashing, you can add `--skip-process` to start the container without launching service processes.
 
-Do not edit slapd.conf it's not used. To modify your server configuration use ldap utils: **ldapmodify / ldapadd / ldapdelete**
-
-#### Seed ldap database with ldif
-
-This image can load ldif files at startup with either `ldapadd` or `ldapmodify`.
-Mount `.ldif` in `/container/service/slapd/assets/config/bootstrap/ldif` directory if you want to overwrite image default bootstrap ldif files or in `/container/service/slapd/assets/config/bootstrap/ldif/custom` (recommended) to extend image config.
-
-Files containing `changeType:` attributes will be loaded with `ldapmodify`.
-
-The startup script provides some substitutions in bootstrap ldif files. Following substitutions are supported:
-
-- `{{ LDAP_BASE_DN }}`
-- `{{ LDAP_BACKEND }}`
-- `{{ LDAP_DOMAIN }}`
-- `{{ LDAP_READONLY_USER_USERNAME }}`
-- `{{ LDAP_READONLY_USER_PASSWORD_ENCRYPTED }}`
-
-Other `{{ * }}` substitutions are left unchanged.
-
-Since startup script modifies `ldif` files, you **must** add `--copy-service`
-argument to entrypoint if you don't want to overwrite them.
-
-```sh
-# single file example:
-docker run \
-	--volume ./bootstrap.ldif:/container/service/slapd/assets/config/bootstrap/ldif/50-bootstrap.ldif \
-	osixia/openldap:1.5.0 --copy-service
-
-# directory example:
-docker run \
-	--volume ./ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom \
-	osixia/openldap:1.5.0 --copy-service
+``` bash
+docker run -it osixia/openldap --log-level debug --bash
+docker run -it osixia/openldap --skip-process --log-level debug --bash
 ```
 
-#### Seed from internal path
-
-This image can load ldif and schema files at startup from an internal path. Additionally, certificates can be copied from an internal path. This is useful if a continuous integration service mounts automatically the working copy (sources) into a docker service, which has a relation to the ci job.
-
-For example: Gitlab is not capable of mounting custom paths into docker services of a ci job, but Gitlab automatically mounts the working copy in every service container. So the working copy (sources) are accessible under `/builds` in every services
-of a ci job. The path to the working copy can be obtained via `${CI_PROJECT_DIR}`. See also: https://docs.gitlab.com/runner/executors/docker.html#build-directory-in-service
-
-This may also work with other CI services, if they automatically mount the working directory to the services of a ci job like Gitlab ci does.
-
-In order to seed ldif or schema files from internal path you must set the specific environment variable `LDAP_SEED_INTERNAL_LDIF_PATH` and/or `LDAP_SEED_INTERNAL_SCHEMA_PATH`. If set this will copy any files in the specified directory into the default seeding
-directories of this image.
-
-Example variables defined in gitlab-ci.yml:
-
-```yml
-variables:
-  LDAP_SEED_INTERNAL_LDIF_PATH: "${CI_PROJECT_DIR}/docker/openldap/ldif"
-  LDAP_SEED_INTERNAL_SCHEMA_PATH: "${CI_PROJECT_DIR}/docker/openldap/schema"
+You can also increase the OpenLDAP daemon (`slapd`) log level with `OPENLDAP_DEBUG_LEVEL`:
+``` bash
+docker run -e OPENLDAP_DEBUG_LEVEL=-1 osixia/openldap
 ```
 
-Also, certificates can be used by the internal path. The file, specified in a variable, will be copied in the default certificate directory of this image. If desired, you can use these with the LDAP_TLS_CRT_FILENAME, LDAP_TLS_KEY_FILENAME, LDAP_TLS_CA_CRT_FILENAME and LDAP_TLS_DH_PARAM_FILENAME to set a different filename in the default certificate directory of the image.
+> `OPENLDAP_DEBUG_LEVEL` only affects OpenLDAP (`slapd`) logging. To increase container/runtime logs, use the baseimage flag `--log-level` (for example `--log-level debug`).
 
-	variables:
-        LDAP_SEED_INTERNAL_LDAP_TLS_CRT_FILE: "${CI_PROJECT_DIR}/docker/certificates/certs/cert.pem"
-        LDAP_SEED_INTERNAL_LDAP_TLS_KEY_FILE: "${CI_PROJECT_DIR}/docker/certificates/certs/key.pem"
-        LDAP_SEED_INTERNAL_LDAP_TLS_CA_CRT_FILE: "${CI_PROJECT_DIR}/docker/certificates/ca/ca.pem"
-        LDAP_SEED_INTERNAL_LDAP_TLS_DH_PARAM_FILE: "${CI_PROJECT_DIR}/certificates/dhparam.pem"
-
-### Use an existing ldap database
-
-This can be achieved by mounting host directories as volume.
-Assuming you have a LDAP database on your docker host in the directory `/data/slapd/database`
-and the corresponding LDAP config files on your docker host in the directory `/data/slapd/config`
-simply mount this directories as a volume to `/var/lib/ldap` and `/etc/ldap/slapd.d`:
-
-```sh
-docker run \
-	--volume /data/slapd/database:/var/lib/ldap \
-	--volume /data/slapd/config:/etc/ldap/slapd.d \
-	--detach osixia/openldap:1.5.0
+To see all available command-line options:
+``` bash
+docker run --rm osixia/openldap --help # osixia/baseimage options
+docker run --rm osixia/openldap -x openldap -- --help # slapd command-line options
 ```
 
-You can also use data volume containers. Please refer to:
-> [https://docs.docker.com/engine/tutorials/dockervolumes/](https://docs.docker.com/engine/tutorials/dockervolumes/)
+## 🛟 Backup / Restore
 
-Note: By default this image is waiting an **mdb**  database backend, if you want to use any other database backend set backend type via the LDAP_BACKEND environment variable.
+The image includes the `openldap-ctl` helper with `backup` and `restore` commands.
 
-### Backup
-A simple solution to backup your ldap server, is our openldap-backup docker image:
-> [osixia/openldap-backup](https://github.com/osixia/docker-openldap-backup)
+Create a full backup:
 
-### Administrate your ldap server
-If you are looking for a simple solution to administrate your ldap server you can take a look at our phpLDAPadmin docker image:
-> [osixia/phpldapadmin](https://github.com/osixia/docker-phpLDAPadmin)
-
-### TLS
-
-#### Use auto-generated certificate
-By default, TLS is already configured and enabled, certificate is created using container hostname (it can be set by docker run --hostname option eg: ldap.example.org).
-
-```sh
-docker run --hostname ldap.my-company.com --detach osixia/openldap:1.5.0
+```bash
+docker exec openldap container run -- openldap-ctl backup my-backup
 ```
 
-#### Use your own certificate
+Create only a data backup and remove files older than 15 days:
 
-You can set your custom certificate at run time, by mounting a directory containing those files to **/container/service/slapd/assets/certs** and adjust their name with the following environment variables:
-
-```sh
-docker run \
-	--hostname ldap.example.org \
-	--volume /path/to/certificates:/container/service/slapd/assets/certs \
-	--env LDAP_TLS_CRT_FILENAME=my-ldap.crt \
-	--env LDAP_TLS_KEY_FILENAME=my-ldap.key \
-	--env LDAP_TLS_CA_CRT_FILENAME=the-ca.crt \
-	--detach osixia/openldap:1.5.0
+```bash
+docker exec openldap container run -- openldap-ctl backup my-backup --data --clean 15
 ```
 
-Other solutions are available please refer to the [Advanced User Guide](#advanced-user-guide)
+This creates files in `OPENLDAP_BACKUP_DIR`:
 
-#### Disable TLS
-Add --env LDAP_TLS=false to the run command:
+- `my-backup-config.gz`
+- `my-backup-data.gz`
 
-	docker run --env LDAP_TLS=false --detach osixia/openldap:1.5.0
+Restore a backup:
 
-### Multi master replication
-Quick example, with the default config.
-
-	#Create the first ldap server, save the container id in LDAP_CID and get its IP:
-	LDAP_CID=$(docker run --hostname ldap.example.org --env LDAP_REPLICATION=true --detach osixia/openldap:1.5.0)
-	LDAP_IP=$(docker inspect -f "{{ .NetworkSettings.IPAddress }}" $LDAP_CID)
-
-	#Create the second ldap server, save the container id in LDAP2_CID and get its IP:
-	LDAP2_CID=$(docker run --hostname ldap2.example.org --env LDAP_REPLICATION=true --detach osixia/openldap:1.5.0)
-	LDAP2_IP=$(docker inspect -f "{{ .NetworkSettings.IPAddress }}" $LDAP2_CID)
-
-	#Add the pair "ip hostname" to /etc/hosts on each containers,
-	#because ldap.example.org and ldap2.example.org are fake hostnames
-	docker exec $LDAP_CID bash -c "echo $LDAP2_IP ldap2.example.org >> /etc/hosts"
-	docker exec $LDAP2_CID bash -c "echo $LDAP_IP ldap.example.org >> /etc/hosts"
-
-That's it! But a little test to be sure:
-
-Add a new user "billy" on the first ldap server
-
-	docker exec $LDAP_CID ldapadd -x -D "cn=admin,dc=example,dc=org" -w admin -f /container/service/slapd/assets/test/new-user.ldif -H ldap://ldap.example.org -ZZ
-
-Search on the second ldap server, and billy should show up!
-
-	docker exec $LDAP2_CID ldapsearch -x -H ldap://ldap2.example.org -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w admin -ZZ
-
-	[...]
-
-	# billy, example.org
-	dn: uid=billy,dc=example,dc=org
-	uid: billy
-	cn: billy
-	sn: 3
-	objectClass: top
-	objectClass: posixAccount
-	objectClass: inetOrgPerson
-	[...]
-
-### Fix docker mounted file problems
-
-You may have some problems with mounted files on some systems. The startup script try to make some file adjustment and fix files owner and permissions, this can result in multiple errors. See [Docker documentation](https://docs.docker.com/v1.4/userguide/dockervolumes/#mount-a-host-file-as-a-data-volume).
-
-To fix that run the container with `--copy-service` argument :
-
-		docker run [your options] osixia/openldap:1.5.0 --copy-service
-
-### Debug
-
-The container default log level is **info**.
-Available levels are: `none`, `error`, `warning`, `info`, `debug` and `trace`.
-
-Example command to run the container in `debug` mode:
-
-```sh
-docker run --detach osixia/openldap:1.5.0 --loglevel debug
+``` bash
+docker exec openldap container run -- openldap-ctl restore my-backup --force
 ```
 
-See all command line options:
+`--force` stops the OpenLDAP process if needed, deletes existing data in the target directories, restores the selected databases, then starts OpenLDAP again.
 
-```sh
-docker run osixia/openldap:1.5.0 --help
+You can also run a cron service to automatically perform regular backups:
+
+``` bash
+docker run --name openldap-cron \
+  -u root \
+  -v openldap-conf:/etc/openldap/slapd.d \
+  -v openldap-data:/var/lib/openldap/openldap-data \
+  -v openldap-backups:/var/lib/openldap/openldap-backups \
+  osixia/openldap -x openldap-cron
 ```
 
-## Environment Variables
-Environment variables defaults are set in **image/environment/default.yaml** and **image/environment/default.startup.yaml**.
+See the `OPENLDAP_CRON_JOB` environment variable to adjust the cron schedule and behavior.
 
-See how to [set your own environment variables](#set-your-own-environment-variables)
+## 🔐 TLS
 
-### Default.yaml
-Variables defined in this file are available at anytime in the container environment.
+Set `OPENLDAP_BOOTSTRAP_TLS=true` to configure TLS during bootstrap.
 
-General container configuration:
-- **LDAP_LOG_LEVEL**: Slap log level. defaults to  `256`. See table 5.1 in https://www.openldap.org/doc/admin24/slapdconf2.html for the available log levels.
+The default certificate paths are:
 
-### Default.startup.yaml
-Variables defined in this file are only available during the container **first start** in **startup files**.
-This file is deleted right after startup files are processed for the first time,
-then all of these values will not be available in the container environment.
+- `/container/services/openldap/assets/certs/cert.crt`
+- `/container/services/openldap/assets/certs/cert.key`
+- `/container/services/openldap/assets/certs/ca.crt`
 
-This helps to keep your container configuration secret. If you don't care all environment variables can be defined in **default.yaml** and everything will work fine.
+The simplest way is to mount a directory that contains files with exactly those names:
 
-Required and used for new ldap server only:
-- **LDAP_ORGANISATION**: Organisation name. Defaults to `Example Inc.`
-- **LDAP_DOMAIN**: Ldap domain. Defaults to `example.org`
-- **LDAP_BASE_DN**: Ldap base DN. If empty automatically set from LDAP_DOMAIN value. Defaults to `(empty)`
-- **LDAP_ADMIN_PASSWORD** Ldap Admin password. Defaults to `admin`
-- **LDAP_CONFIG_PASSWORD** Ldap Config password. Defaults to `config`
-
-- **LDAP_READONLY_USER** Add a read only user. Defaults to `false`
-  > **Note:** The read only user **does** have write access to its own password.
-- **LDAP_READONLY_USER_USERNAME** Read only user username. Defaults to `readonly`
-- **LDAP_READONLY_USER_PASSWORD** Read only user password. Defaults to `readonly`
-
-- **LDAP_RFC2307BIS_SCHEMA** Use rfc2307bis schema instead of nis schema. Defaults to `false`
-
-Backend:
-- **LDAP_BACKEND**: Ldap backend. Defaults to `mdb` (previously hdb in image versions up to v1.1.10)
-
-	Help: https://www.openldap.org/doc/admin24/backends.html
-
-TLS options:
-- **LDAP_TLS**: Add openldap TLS capabilities. Can't be removed once set to true. Defaults to `true`.
-- **LDAP_TLS_CRT_FILENAME**: Ldap ssl certificate filename. Defaults to `ldap.crt`
-- **LDAP_TLS_KEY_FILENAME**: Ldap ssl certificate private key filename. Defaults to `ldap.key`
-- **LDAP_TLS_DH_PARAM_FILENAME**: Ldap ssl certificate dh param file. Defaults to `dhparam.pem`
-- **LDAP_TLS_CA_CRT_FILENAME**: Ldap ssl CA certificate  filename. Defaults to `ca.crt`
-- **LDAP_TLS_ENFORCE**: Enforce TLS but except ldapi connections. Can't be disabled once set to true. Defaults to `false`.
-- **LDAP_TLS_CIPHER_SUITE**: TLS cipher suite. Defaults to `SECURE256:+SECURE128:-VERS-TLS-ALL:+VERS-TLS1.2:-RSA:-DHE-DSS:-CAMELLIA-128-CBC:-CAMELLIA-256-CBC`, based on Red Hat's [TLS hardening guide](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Security_Guide/sec-Hardening_TLS_Configuration.html)
-- **LDAP_TLS_VERIFY_CLIENT**: TLS verify client. Defaults to `demand`
-
-	Help: https://www.openldap.org/doc/admin24/tls.html
-
-Replication options:
-- **LDAP_REPLICATION**: Add openldap replication capabilities. Possible values : `true`, `false`, `own`. Defaults to `false`. Setting this to `own` allow to provide own replication settings via custom bootstrap ldifs.
-
-- **LDAP_REPLICATION_CONFIG_SYNCPROV**: olcSyncRepl options used for the config database. Without **rid** and **provider** which are automatically added based on LDAP_REPLICATION_HOSTS.  Defaults to `binddn="cn=admin,cn=config" bindmethod=simple credentials=$LDAP_CONFIG_PASSWORD searchbase="cn=config" type=refreshAndPersist retry="60 +" timeout=1 starttls=critical`
-
-- **LDAP_REPLICATION_DB_SYNCPROV**: olcSyncRepl options used for the database. Without **rid** and **provider** which are automatically added based on LDAP_REPLICATION_HOSTS.  Defaults to `binddn="cn=admin,$LDAP_BASE_DN" bindmethod=simple credentials=$LDAP_ADMIN_PASSWORD searchbase="$LDAP_BASE_DN" type=refreshAndPersist interval=00:00:00:10 retry="60 +" timeout=1 starttls=critical`
-
-- **LDAP_REPLICATION_HOSTS**: list of replication hosts, must contain the current container hostname set by --hostname on docker run command. Defaults to :
-	```yaml
-  - ldap://ldap.example.org
-  - ldap://ldap2.example.org
-	```
-
-	If you want to set this variable at docker run command add the tag `#PYTHON2BASH:` and convert the yaml in python:
-
-		docker run --env LDAP_REPLICATION_HOSTS="#PYTHON2BASH:['ldap://ldap.example.org','ldap://ldap2.example.org']" --detach osixia/openldap:1.5.0
-
-	To convert yaml to python online: https://yaml-online-parser.appspot.com/
-
-Other environment variables:
-- **KEEP_EXISTING_CONFIG**: Do not change the ldap config. Defaults to `false`
-	- if set to *true* with an existing database, config will remain unchanged. Image tls and replication config will not be run. The container can be started with LDAP_ADMIN_PASSWORD and LDAP_CONFIG_PASSWORD empty or filled with fake data.
-	- if set to *true* when bootstrapping a new database, bootstrap ldif and schema will not be added and tls and replication config will not be run.
-
-- **LDAP_REMOVE_CONFIG_AFTER_SETUP**: delete config folder after setup. Defaults to `true`
-- **LDAP_SSL_HELPER_PREFIX**: ssl-helper environment variables prefix. Defaults to `ldap`, ssl-helper first search config from LDAP_SSL_HELPER_* variables, before SSL_HELPER_* variables.
-- **HOSTNAME**: set the hostname of the running openldap server. Defaults to whatever docker creates.
-- **DISABLE_CHOWN**: do not perform any chown to fix file ownership. Defaults to `false`
-- LDAP_OPENLDAP_UID: runtime docker user uid to run container as
-- LDAP_OPENLDAP_GID: runtime docker user gid to run container as
-
-
-### Set your own environment variables
-
-#### Use command line argument
-Environment variables can be set by adding the --env argument in the command line, for example:
-
-```sh
-docker run \
-	--env LDAP_ORGANISATION="My company" \
-	--env LDAP_DOMAIN="my-company.com" \
-	--env LDAP_ADMIN_PASSWORD="JonSn0w" \
-	--detach osixia/openldap:1.5.0
+```bash
+docker run --name openldap --hostname ldap.example.org -p 389:3890 -p 636:6360 \
+  -e OPENLDAP_BOOTSTRAP_TLS=true \
+  -v $PWD/certs:/container/services/openldap/assets/certs \
+  osixia/openldap
 ```
 
-Be aware that environment variable added in command line will be available at any time
-in the container. In this example if someone manage to open a terminal in this container
-he will be able to read the admin password in clear text from environment variables.
+If you also set `OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true`, bootstrap adds TLS-required access rules. That setting is stricter than plain TLS enablement and is intended for deployments where non-TLS client access should be rejected.
 
-#### Link environment file
+## 🔁 Replication
 
-For example if your environment files **my-env.yaml** and **my-env.startup.yaml** are in /data/ldap/environment
+Set `OPENLDAP_BOOTSTRAP_REPLICATION=true` to bootstrap syncrepl replication.
 
-```sh
-docker run \
-	--volume /data/ldap/environment:/container/environment/01-custom \
-	--detach osixia/openldap:1.5.0
+`OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS` must contain at least two hosts, in the same order on every server. The current node FQDN must match one of them.
+
+When replication is enabled, set `OPENLDAP_URLS` with the node hostname in LDAP/LDAPS URLs (for example `ldap://ldap1.example.org:3890 ldaps://ldap1.example.org:6360 ldapi:///`) so advertised endpoints match replication hosts.
+
+For a local Docker setup, put both containers on the same user-defined network so each host can resolve the other one:
+
+```bash
+docker network create openldap-net
 ```
 
-Take care to link your environment files folder to `/container/environment/XX-somedir` (with XX < 99 so they will be processed before default environment files) and not  directly to `/container/environment` because this directory contains predefined baseimage environment files to fix container environment (INITRD, LANG, LANGUAGE and LC_CTYPE).
+Minimal example for `ldap1.example.org`:
 
-Note: the container will try to delete the **\*.startup.yaml** file after the end of startup files so the file will also be deleted on the docker host. To prevent that : use --volume /data/ldap/environment:/container/environment/01-custom**:ro** or set all variables in **\*.yaml** file and don't use **\*.startup.yaml**:
-
-```sh
-docker run \
-	--volume /data/ldap/environment/my-env.yaml:/container/environment/01-custom/env.yaml \
-	--detach osixia/openldap:1.5.0
+```bash
+docker run --name ldap1 --network openldap-net --hostname ldap1.example.org \
+  -e OPENLDAP_URLS="ldap://ldap1.example.org:3890 ldaps://ldap1.example.org:6360 ldapi:///" \
+  -e OPENLDAP_BOOTSTRAP_ORGANIZATION="Keycloakers Org" \
+  -e OPENLDAP_BOOTSTRAP_SUFFIX="dc=keycloakers,dc=org" \
+  -e OPENLDAP_BOOTSTRAP_REPLICATION=true \
+  -e OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS="ldap://ldap1.example.org:3890 ldap://ldap2.example.org:3890" \
+  -e OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD="passw0rd" \
+  osixia/openldap
 ```
 
-#### Docker Secrets
+Minimal example for `ldap2.example.org`:
 
-As an alternative to passing sensitive information via environmental variables, _FILE may be appended to the listed variables, causing
-the startup.sh script to load the values for those values from files presented in the container. This is particular useful for loading
-passwords using the [Docker secrets](https://docs.docker.com/engine/swarm/secrets/) mechanism. For example:
-
-```sh
-docker run \
-	--env LDAP_ORGANISATION="My company" \
-	--env LDAP_DOMAIN="my-company.com" \
-	--env LDAP_ADMIN_PASSWORD_FILE=/run/secrets/ \
-	authentication_admin_pw \
-	--detach osixia/openldap:1.2.4
+```bash
+docker run --name ldap2 --network openldap-net --hostname ldap2.example.org \
+  -e OPENLDAP_URLS="ldap://ldap2.example.org:3890 ldaps://ldap2.example.org:6360 ldapi:///" \
+  -e OPENLDAP_BOOTSTRAP_ORGANIZATION="Keycloakers Org" \
+  -e OPENLDAP_BOOTSTRAP_SUFFIX="dc=keycloakers,dc=org" \
+  -e OPENLDAP_BOOTSTRAP_REPLICATION=true \
+  -e OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS="ldap://ldap1.example.org:3890 ldap://ldap2.example.org:3890" \
+  -e OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD="passw0rd" \
+  osixia/openldap
 ```
 
-Currently this is only supported for LDAP_ADMIN_PASSWORD, LDAP_CONFIG_PASSWORD, LDAP_READONLY_USER_PASSWORD
+If TLS is required for replication, set `OPENLDAP_BOOTSTRAP_REPLICATION_TLS=true` or rely on its default value from `OPENLDAP_BOOTSTRAP_TLS_REQUIRED`.
 
-#### Make your own image or extend this image
+## 🛠️ LDAP Toolkit
 
-This is the best solution if you have a private registry. Please refer to the [Advanced User Guide](#advanced-user-guide) just below.
+### OpenLDAP Utilities
 
-## Advanced User Guide
+This image ships with the full suite of OpenLDAP utilities — both server-side database tools and LDAP client tools.
 
-### Extend osixia/openldap:1.5.0 image
+**Database tools**
 
-If you need to add your custom TLS certificate, bootstrap config or environment files the easiest way is to extends this image.
+`slapcat`, `slapadd`, `slapindex`, and `slaptest` operate directly on the local database files and must run inside the container.
 
-Dockerfile example:
+Export the data database to LDIF:
 
-```dockerfile
-FROM osixia/openldap:1.5.0
-LABEL maintainer="Your Name <your@name.com>"
-
-ADD bootstrap /container/service/slapd/assets/config/bootstrap
-ADD certs /container/service/slapd/assets/certs
-ADD environment /container/environment/01-custom
+``` bash
+docker exec openldap container run -- slapcat -n 1
 ```
 
-See complete example in **example/extend-osixia-openldap**
+Export the config database (`cn=config`):
 
-Warning: if you want to install new packages from debian repositories, this image has a configuration to prevent documentation and locales to be installed. If you need the doc and locales remove the following files :
-**/etc/dpkg/dpkg.cfg.d/01_nodoc** and **/etc/dpkg/dpkg.cfg.d/01_nolocales**
-
-### Make your own openldap image
-
-Clone this project:
-
-```sh
-git clone https://github.com/osixia/docker-openldap
-cd docker-openldap
+``` bash
+docker exec openldap container run -- slapcat -n 0
 ```
 
-Adapt Makefile, set your image NAME and VERSION, for example:
+> **Note:** `slapadd` and `slapindex` require OpenLDAP to be stopped first. Use `docker exec openldap container processes stop openldap` to stop OpenLDAP and `docker exec openldap container processes start openldap` to restart OpenLDAP.
 
-```makefile
-NAME = osixia/openldap
-VERSION = 1.1.9
+**LDAP client tools**
+
+`ldapsearch`, `ldapwhoami`, `ldapadd`, `ldapmodify`, `ldapdelete`, and `ldappasswd` connect to any LDAP server over the network.
+
+Search for all entries under a base DN:
+
+``` bash
+docker run --rm osixia/openldap run -- \
+  ldapsearch -H ldap://172.16.0.1 \
+  -D "cn=admin,dc=example,dc=org" -w passw0rd \
+  -b "dc=example,dc=org" "(objectClass=*)"
 ```
 
-become:
+Verify bind credentials:
 
-```makefile
-NAME = cool-guy/openldap
-VERSION = 0.1.0
+``` bash
+docker run --rm osixia/openldap run -- \
+  ldapwhoami -H ldap://172.16.0.1 \
+  -D "cn=admin,dc=example,dc=org" -w passw0rd
 ```
 
-Add your custom certificate, bootstrap ldif and environment files...
+Add entries from a local LDIF file:
 
-Build your image:
-
-```sh
-make build
+``` bash
+docker run --rm -v /path/to/entries.ldif:/tmp/entries.ldif \
+  osixia/openldap run -- \
+  ldapadd -H ldap://172.16.0.1 \
+  -D "cn=admin,dc=example,dc=org" -w passw0rd \
+  -f /tmp/entries.ldif
 ```
 
-Run your image:
+Change a user's password:
 
-```sh
-docker run --detach cool-guy/openldap:0.1.0
+``` bash
+docker run --rm osixia/openldap run -- \
+  ldappasswd -H ldap://172.16.0.1 \
+  -D "cn=admin,dc=example,dc=org" -w passw0rd \
+  -s newpassword "uid=jdoe,ou=people,dc=example,dc=org"
 ```
 
-### Tests
+### Password Helpers
 
-We use **Bats** (Bash Automated Testing System) to test this image:
+Generate a random password:
 
-> [https://github.com/bats-core/bats-core](https://github.com/bats-core/bats-core)
-
-Install Bats, and in this project directory run:
-
-```sh
-make test
+``` bash
+docker run --rm osixia/openldap run -- openldap-ctl password generate
 ```
 
-### Kubernetes
+Hash a password:
 
-Kubernetes is an open source system for managing containerized applications across multiple hosts, providing basic mechanisms for deployment, maintenance, and scaling of applications.
+``` bash
+docker run --rm osixia/openldap run -- openldap-ctl password hash passw0rd
+```
 
-More information:
-- https://kubernetes.io/
-- https://github.com/kubernetes/kubernetes
+### Convert Schema to LDIF
 
-osixia-openldap kubernetes examples are available in **example/kubernetes**
+``` bash
+docker run --rm -v schema:/data \
+  osixia/openldap run -- openldap-ctl schema2ldif /data/test.schema
+```
 
-### Under the hood: osixia/light-baseimage
+## 🔤 Environment Variables
 
-This image is based on osixia/light-baseimage.
-It uses the following features:
+**Core**
 
-- **ssl-tools** service to generate tls certificates
-- **log-helper** tool to print log messages based on the log level
-- **run** tool as entrypoint to init the container environment
+| Variable                      | Description                                           | Default                                      |
+| ----------------------------- | ----------------------------------------------------- | -------------------------------------------- |
+| `OPENLDAP_CONF_DIR`           | OpenLDAP configuration directory (`slapd.d`)          | `/etc/openldap/slapd.d`                      |
+| `OPENLDAP_DATA_DIR`           | OpenLDAP data directory                               | `/var/lib/openldap/openldap-data`            |
+| `OPENLDAP_BACKUP_DIR`         | Backup directory used by `openldap-ctl backup`        | `/var/lib/openldap/openldap-backups`         |
+| `OPENLDAP_MODULES_DIR`        | Directory used by OpenLDAP dynamic modules            | `/usr/lib/openldap`                          |
+| `OPENLDAP_SCHEMAS_DIR`        | Directory containing LDIF schemas loaded at bootstrap | `/etc/openldap/schema`                       |
+| `OPENLDAP_CUSTOM_MODULES_DIR` | Custom modules copied at startup                      | `/container/services/openldap/assets/module` |
+| `OPENLDAP_CUSTOM_SCHEMAS_DIR` | Custom schemas copied at startup                      | `/container/services/openldap/assets/schema` |
+| `OPENLDAP_NOFILE`             | `ulimit -n` value before starting `slapd`             | `65536`                                      |
+| `OPENLDAP_DEBUG_LEVEL`        | Default `slapd` debug level                           | `256`                                        |
+| `OPENLDAP_URLS`               | Listener URLs passed to `slapd -h`                    | `ldap://:3890 ldaps://:6360 ldapi:///`      |
 
-To fully understand how this image works take a look at:
-https://github.com/osixia/docker-light-baseimage
+**Bootstrap**
 
-## Security
-If you discover a security vulnerability within this docker image, please send an email to the Osixia! team at security@osixia.net. For minor vulnerabilities feel free to add an issue here on github.
+| Variable                                              | Description                                                                       | Default                                                     |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `OPENLDAP_BOOTSTRAP_ORGANIZATION`                     | Organization name used in bootstrap data                                          | `Example Org`                                               |
+| `OPENLDAP_BOOTSTRAP_SUFFIX`                           | Base LDAP suffix                                                                  | `dc=example,dc=org`                                         |
+| `OPENLDAP_BOOTSTRAP_MODULES`                          | OpenLDAP modules loaded during bootstrap                                          | `back_mdb.so argon2.so refint.so ppolicy.so unique.so memberof.so syncprov.so` |
+| `OPENLDAP_BOOTSTRAP_SCHEMAS`                          | LDIF schemas imported during bootstrap                                            | `core.ldif cosine.ldif inetorgperson.ldif rfc2307bis.ldif`  |
+| `OPENLDAP_BOOTSTRAP_GLOBAL_SIZE_LIMIT`                         | Global LDAP size limit                                                            | `500`                                                       |
+| `OPENLDAP_BOOTSTRAP_GLOBAL_TIME_LIMIT`                         | Global LDAP time limit                                                            | `120`                                                       |
+| `OPENLDAP_BOOTSTRAP_GLOBAL_IDLE_TIMEOUT`                       | Global LDAP idle timeout                                                          | `3600`                                                      |
+| `OPENLDAP_BOOTSTRAP_CONFIG_PASSWORD_HASH`                      | Password hash scheme configured in `olcPasswordHash`                              | `{ARGON2}`                                                  |
+| `OPENLDAP_BOOTSTRAP_CONFIG_ROOT_DN`                   | Root DN for `cn=config`                                                           | `cn=admin,cn=config`                                        |
+| `OPENLDAP_BOOTSTRAP_CONFIG_ROOT_PASSWORD_HASHED`      | Hashed password for `cn=config`; generated if empty                               | ``                                                          |
+| `OPENLDAP_BOOTSTRAP_DATA_DATABASE_MAX_SIZE`           | MDB max size for main database                                                    | `10737418240`                                               |
+| `OPENLDAP_BOOTSTRAP_DATA_ROOT_DN`                     | Root DN for main database                                                         | `cn=admin,${OPENLDAP_BOOTSTRAP_SUFFIX}`                     |
+| `OPENLDAP_BOOTSTRAP_DATA_ROOT_PASSWORD_HASHED`        | Hashed password for main database root DN; generated if empty                     | ``                                                          |
+| `OPENLDAP_BOOTSTRAP_DATA_READONLY`                    | Enable read-only data account creation                                            | `false`                                                     |
+| `OPENLDAP_BOOTSTRAP_DATA_READONLY_DN`                 | DN of the read-only data account                                                  | `cn=readonly,${OPENLDAP_BOOTSTRAP_SUFFIX}`                  |
+| `OPENLDAP_BOOTSTRAP_DATA_READONLY_PASSWORD_HASHED`    | Hashed password of the read-only data account; generated if empty when enabled    | ``                                                          |
+| `OPENLDAP_BOOTSTRAP_MONITOR_ENABLED`                  | Enable monitor backend                                                            | `false`                                                     |
+| `OPENLDAP_BOOTSTRAP_MONITOR_READONLY`                 | Enable read-only monitor account creation                                         | `false`                                                     |
+| `OPENLDAP_BOOTSTRAP_MONITOR_READONLY_DN`              | DN of the read-only monitor account                                               | `cn=readonly-monitor,${OPENLDAP_BOOTSTRAP_SUFFIX}`          |
+| `OPENLDAP_BOOTSTRAP_MONITOR_READONLY_PASSWORD_HASHED` | Hashed password of the read-only monitor account; generated if empty when enabled | ``                                                          |
+| `OPENLDAP_BOOTSTRAP_LDIF_CONFIG_DIR`                  | Source directory for config LDIF bootstrap files                                  | `/container/services/openldap-bootstrap/assets/ldif/config` |
+| `OPENLDAP_BOOTSTRAP_LDIF_DATA_DIR`                    | Source directory for data LDIF bootstrap files                                    | `/container/services/openldap-bootstrap/assets/ldif/data`   |
+| `OPENLDAP_BOOTSTRAP_SCRIPTS_DIR`                      | Source directory for bootstrap scripts                                            | `/container/services/openldap-bootstrap/assets/scripts`     |
 
-Please include as many details as possible.
+**TLS**
 
-### Known security issues
-OpenLDAP on debian creates two admin users with the same password, if you changed admin password after bootstrap you may be concerned by issue #161.
+| Variable                               | Description                                    | Default                                              |
+| -------------------------------------- | ---------------------------------------------- | ---------------------------------------------------- |
+| `OPENLDAP_BOOTSTRAP_TLS`               | Enable TLS configuration during bootstrap      | `false`                                              |
+| `OPENLDAP_BOOTSTRAP_TLS_CERT`          | Server certificate path                        | `/container/services/openldap/assets/certs/cert.crt` |
+| `OPENLDAP_BOOTSTRAP_TLS_CERT_KEY`      | Server private key path                        | `/container/services/openldap/assets/certs/cert.key` |
+| `OPENLDAP_BOOTSTRAP_TLS_CA_CERT`       | CA certificate path                            | `/container/services/openldap/assets/certs/ca.crt`   |
+| `OPENLDAP_BOOTSTRAP_TLS_VERIFY_CLIENT` | Value for `olcTLSVerifyClient`                 | `allow`                                              |
+| `OPENLDAP_BOOTSTRAP_TLS_PROTOCOL_MIN`  | Value for `olcTLSProtocolMin`                  | `3.4`                                                |
+| `OPENLDAP_BOOTSTRAP_TLS_REQUIRED`      | Enforce TLS-only access rules during bootstrap | `false`                                              |
 
-## Changelog
+**RefInt**
 
-Please refer to: [CHANGELOG.md](CHANGELOG.md)
+| Variable                               | Description                                   | Default                             |
+| -------------------------------------- | --------------------------------------------- | ----------------------------------- |
+| `OPENLDAP_BOOTSTRAP_REFINT`            | Enable the `refint` overlay during bootstrap  | `false`                             |
+| `OPENLDAP_BOOTSTRAP_REFINT_ATTRIBUTES` | Attributes maintained by the `refint` overlay | `member uniqueMember manager owner` |
+
+**PPolicy**
+
+| Variable                                                    | Description                                             | Default                                            |
+| ----------------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------- |
+| `OPENLDAP_BOOTSTRAP_PPOLICY`                                | Enable the password policy overlay during bootstrap     | `false`                                            |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_HASH_CLEAR_TEXT`                | Value for `olcPPolicyHashCleartext`                     | `true`                                             |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_USE_LOCKOUT`                    | Value for `olcPPolicyUseLockout`                        | `true`                                             |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_CHECK_MODULE`                   | Optional value for `olcPPolicyCheckModule`              | ``                                                 |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_GROUP_DN`                       | DN of the policy container created in the main database | `ou=Policies,${OPENLDAP_BOOTSTRAP_SUFFIX}`         |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_POLICY_DN`              | DN of the default password policy                       | `cn=default,${OPENLDAP_BOOTSTRAP_PPOLICY_GROUP_DN}` |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MIN_LENGTH`             | Value for `pwdMinLength`                                | `12`                                               |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_CHECK_QUALITY`          | Value for `pwdCheckQuality`                             | `0`                                                |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_IN_HISTORY`             | Value for `pwdInHistory`                                | `12`                                               |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_ALLOW_USER_CHANGE`      | Value for `pwdAllowUserChange`                          | `true`                                             |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_SAFE_MODIFY`            | Value for `pwdSafeModify`                               | `true`                                             |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MUST_CHANGE`            | Value for `pwdMustChange`                               | `false`                                            |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MIN_AGE`                | Value for `pwdMinAge`                                   | `0`                                                |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_FAILURE`            | Value for `pwdMaxFailure`                               | `5`                                                |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_FAILURE_COUNT_INTERVAL` | Value for `pwdFailureCountInterval`                     | `300`                                              |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT`                | Value for `pwdLockout`                                  | `true`                                             |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT_DURATION`       | Value for `pwdLockoutDuration`                          | `900`                                              |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_AGE`                | Value for `pwdMaxAge`                                   | `7776000`                                          |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_EXPIRE_WARNING`         | Value for `pwdExpireWarning`                            | `1209600`                                          |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_GRACE_AUTH_NLIMIT`      | Value for `pwdGraceAuthNLimit`                          | `3`                                                |
+
+**Unique**
+
+| Variable                         | Description                                   | Default                              |
+| -------------------------------- | --------------------------------------------- | ------------------------------------ |
+| `OPENLDAP_BOOTSTRAP_UNIQUE`      | Enable the `unique` overlay during bootstrap  | `false`                              |
+| `OPENLDAP_BOOTSTRAP_UNIQUE_URIS` | URIs enforced by the `unique` overlay         | `ldap:///?uid?sub ldap:///?mail?sub` |
+
+**MemberOf**
+
+| Variable                                  | Description                                           | Default        |
+| ----------------------------------------- | ----------------------------------------------------- | -------------- |
+| `OPENLDAP_BOOTSTRAP_MEMBEROF`             | Enable the `memberof` overlay during bootstrap        | `false`        |
+| `OPENLDAP_BOOTSTRAP_MEMBEROF_GROUP_OC`    | ObjectClass treated as a group by `memberof`          | `groupOfNames` |
+| `OPENLDAP_BOOTSTRAP_MEMBEROF_MEMBER_AD`   | Group membership attribute watched by `memberof`      | `member`       |
+| `OPENLDAP_BOOTSTRAP_MEMBEROF_MEMBEROF_AD` | Reverse membership attribute maintained by `memberof` | `memberOf`     |
+| `OPENLDAP_BOOTSTRAP_MEMBEROF_ADD_CHECK`   | Check new entries against existing groups on Add      | `true`         |
+| `OPENLDAP_BOOTSTRAP_MEMBEROF_DANGLING`    | Handling of group members that do not exist yet       | `ignore`       |
+
+**Replication**
+
+| Variable                                                   | Description                                                                | Default                                                               |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `OPENLDAP_BOOTSTRAP_REPLICATION`                           | Enable replication bootstrap                                               | `false`                                                               |
+| `OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS`                     | Replication endpoints list; at least two, same order on every server       | `ldap://ldap1.example.org:3890 ldap://ldap2.example.org:3890`         |
+| `OPENLDAP_BOOTSTRAP_REPLICATION_SYNCPROV_CHECKPOINT`       | `syncprov` checkpoint configuration                                        | `100 10`                                                              |
+| `OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_DN`          | Replication account DN for the main database                               | `cn=data-replicator,${OPENLDAP_BOOTSTRAP_SUFFIX}`                     |
+| `OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD`    | Plain password for the data replication account; generated if empty        | ``                                                                    |
+| `OPENLDAP_BOOTSTRAP_REPLICATION_DATA_SYNC_REPL_TEMPLATE`   | Template used to generate data `olcSyncRepl`                               | `rid=\${OPENLDAP_BOOTSTRAP_REPLICATION_DATA_SYNC_REPL_RID} ...`       |
+| `OPENLDAP_BOOTSTRAP_REPLICATION_DATA_LIMITS`               | Limits ACL for the data replication account                                | `dn.exact="${OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_DN}" ...`   |
+| `OPENLDAP_BOOTSTRAP_REPLICATION_TLS`                       | Enable TLS settings in generated replication config                        | `${OPENLDAP_BOOTSTRAP_TLS_REQUIRED}`                                  |
+| `OPENLDAP_BOOTSTRAP_REPLICATION_TLS_SYNC_REPL`             | Extra `syncrepl` TLS options                                               | `starttls=critical tls_reqcert=demand`                                |
+| `OPENLDAP_BOOTSTRAP_REPLICATION_MEMBEROF`                  | Enable memberof settings in generated replication config               | `${OPENLDAP_BOOTSTRAP_MEMBEROF}`                                      |
+| `OPENLDAP_BOOTSTRAP_REPLICATION_MEMBEROF_SYNC_REPL`        | Extra `syncrepl` option used when `memberof` replication handling is enabled | `exattrs=${OPENLDAP_BOOTSTRAP_MEMBEROF_MEMBEROF_AD}`                  |
+
+**Helpers and Maintenance**
+
+| Variable                                 | Description                                                 | Default                                                                                                                                                                          |
+| ---------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OPENLDAP_CTL_BACKUP_CONFIG_FILE_SUFFIX` | Suffix used for config backups                              | `-config.gz`                                                                                                                                                                     |
+| `OPENLDAP_CTL_BACKUP_DATA_FILE_SUFFIX`   | Suffix used for data backups                                | `-data.gz`                                                                                                                                                                       |
+| `OPENLDAP_CTL_PASSWORD_GENERATE_CMD`     | Command used by `openldap-ctl password generate`            | `slappasswd -n -g; slappasswd -g`                                                                                                                                                |
+| `OPENLDAP_CTL_PASSWORD_HASH_CMD`         | Command used by `openldap-ctl password hash`                | `slappasswd -h {ARGON2} -o module-path=${OPENLDAP_MODULES_DIR} -o module-load=argon2`                                                                                            |
+| `OPENLDAP_CTL_SCHEMA2LDIF_DEPENDENCIES`  | Default schema dependencies for `schema2ldif`               | `core.schema cosine.schema inetorgperson.schema`                                                                                                                                 |
+| `OPENLDAP_CRON_JOB`                      | Cron job used by the backup service                         | `15 2 * * * PATH=${PATH} container run -- openldap-ctl backup "$(date -I)-${OPENLDAP_VERSION}-openldap-cron" --clean 15` |
+| `OPENLDAP_UPGRADE_FORCE`                 | Allow upgrade bypasses, including forced downgrade handling | `false`                                                                                                                                                                          |
+| `OPENLDAP_UPGRADE_MIGRATION_LEVEL`       | Allowed migration level                                     | `minor`                                                                                                                                                                          |
+| `OPENLDAP_UPGRADE_BACKUP_FILES_PREFIX`   | Prefix for upgrade backup files                             | `openldap-upgrade`                                                                                                                                                               |
+| `OPENLDAP_UPGRADE_CONF_VERSION_FILE`     | File storing the current config version                     | `${OPENLDAP_CONF_DIR}/.version`                                                                                                                                                  |
+
+## 📄 Documentation
+
+See full documentation and complete features list on [osixia/openldap documentation](https://opensource.osixia.net/projects/container-images/openldap/).
+
+This image is based on [osixia/baseimage](https://github.com/osixia/container-baseimage).
+
+## 🔀 Contributing
+
+If you find this project useful here's how you can help:
+
+- Send a pull request with new features and bug fixes.
+- Help new users with [issues](https://github.com/osixia/container-openldap/issues) they may encounter.
+- Support the development of this image and star [this repo][github] and the image [docker hub repository][docker hub].
+
+This project uses a CI/CD tool to build, test, and deploy images. See the source code and useful command lines in [build directory](build/).
+
+## 🔓 License
+
+This project is licensed under the terms of the MIT license. See [LICENSE.md](LICENSE.md) file for more information.

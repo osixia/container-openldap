@@ -1,0 +1,6 @@
+dn: cn=config
+objectClass: olcGlobal
+cn: config
+olcSizeLimit: ${OPENLDAP_BOOTSTRAP_GLOBAL_SIZE_LIMIT}
+olcTimeLimit: ${OPENLDAP_BOOTSTRAP_GLOBAL_TIME_LIMIT}
+olcIdleTimeout: ${OPENLDAP_BOOTSTRAP_GLOBAL_IDLE_TIMEOUT}

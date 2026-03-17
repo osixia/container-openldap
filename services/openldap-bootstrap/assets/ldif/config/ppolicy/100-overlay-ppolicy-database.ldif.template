@@ -1,0 +1,8 @@
+dn: olcOverlay=ppolicy,olcDatabase={1}mdb,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcPPolicyConfig
+olcOverlay: ppolicy
+olcPPolicyDefault: ${OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_POLICY_DN}
+olcPPolicyHashCleartext: ${OPENLDAP_BOOTSTRAP_PPOLICY_HASH_CLEAR_TEXT}
+olcPPolicyUseLockout: ${OPENLDAP_BOOTSTRAP_PPOLICY_USE_LOCKOUT}
+${OPENLDAP_BOOTSTRAP_PPOLICY_CHECK_MODULE_LDIF}
