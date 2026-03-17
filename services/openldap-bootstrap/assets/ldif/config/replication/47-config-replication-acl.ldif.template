@@ -1,0 +1,3 @@
+olcAccess: to *
+  by dn.exact="${OPENLDAP_BOOTSTRAP_REPLICATION_CONFIG_READONLY_DN}" read
+  by * break

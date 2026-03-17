@@ -1,0 +1,20 @@
+services:
+  openldap:
+    image: osixia/openldap
+    container_name: openldap
+    hostname: ldap.example.org
+    ports:
+      - "389:3890"
+      - "636:6360"
+    environment:
+      OPENLDAP_BOOTSTRAP_ORGANIZATION: "Tyrell Corporation"
+      OPENLDAP_BOOTSTRAP_SUFFIX: "dc=tyrell,dc=com"
+    volumes:
+      - openldap-conf:/etc/openldap/slapd.d
+      - openldap-data:/var/lib/openldap/openldap-data
+      - openldap-backups:/var/lib/openldap/openldap-backups
+
+volumes:
+  openldap-conf:
+  openldap-data:
+  openldap-backups:
