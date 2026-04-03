@@ -1,8 +1,19 @@
+# Deprecation Notice for Version 1
+
+After many years of v1 being used in production by so many people (thank you 🙏), it’s time to move forward.
+
+The v1 branch is now officially deprecated and will no longer receive updates or fixes.
+
+If currently using v1, please consider starting the migration process and take a look at v2 here: 👉 https://github.com/osixia/container-openldap/tree/develop
+
+Version 2 brings a more flexible and easier-to-customize configuration, and takes advantage of the latest improvements in the [osixia baseimage](https://github.com/osixia/container-baseimage/tree/develop) to provide a cleaner and more robust foundation.
+
+Feedback, testing, ideas, and contributions are always welcome. Thank you for being part of the community ❤️
+
 # osixia/openldap
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/osixia/openldap.svg)](https://hub.docker.com/r/osixia/openldap/)
 [![Docker Stars](https://img.shields.io/docker/stars/osixia/openldap.svg)](https://hub.docker.com/r/osixia/openldap/)
-[![Layers](https://images.microbadger.com/badges/image/osixia/openldap.svg)](https://hub.docker.com/r/osixia/openldap/)
 
 Latest release: 1.5.0 - [OpenLDAP 2.4.57](https://www.openldap.org/software/release/changes.html) -  [Changelog](CHANGELOG.md) | [Docker Hub](https://hub.docker.com/r/osixia/openldap/) 
 
