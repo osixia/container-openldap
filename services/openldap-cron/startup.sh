@@ -11,4 +11,4 @@ mkdir -p "${OPENLDAP_CRON_DIR}"
 container logger debug "Adding cron job to ${OPENLDAP_CRON_FILE} ..."
 echo "${OPENLDAP_CRON_SCHEDULE} ${OPENLDAP_CRON_JOB}" > "${OPENLDAP_CRON_FILE}"
 
-container envrionment export
+container envrionment save
