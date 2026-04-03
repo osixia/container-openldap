@@ -1,4 +1,4 @@
-ARG BASE_IMAGE="osixia/baseimage:alpine-2.0.0-alpha3"
+ARG BASE_IMAGE="osixia/baseimage:alpine-2.0.0-alpha4"
 FROM ${BASE_IMAGE}
 
 ARG IMAGE="osixia/openldap:develop"
@@ -10,12 +10,8 @@ ARG OPENLDAP_GROUP_GID=911
 ARG OPENLDAP_USER_UID=911
 
 # Add OpenLDAP group and user
-RUN addgroup -g "${OPENLDAP_GROUP_GID}" ldap \
-    && adduser -D \
-         -u "${OPENLDAP_USER_UID}" \
-         -G ldap \
-         -s /sbin/nologin \
-         ldap
+RUN container groups add "${OPENLDAP_GROUP_GID}" ldap \
+    && container users add "${OPENLDAP_USER_UID}" ldap --group-id "${OPENLDAP_GROUP_GID}" --group-name ldap
 
 # Install all OpenLDAP packages
 RUN container packages install --update --clean \
@@ -34,7 +30,6 @@ RUN container services install \
 
 COPY environment /container/environment
 
-# Change user to ldap
-USER ldap:ldap
+USER ldap
 
 EXPOSE 3890 6360

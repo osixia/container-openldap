@@ -40,7 +40,7 @@ prepare_ldif_files() {
     container logger info "Load ${source_dir} LDIFs ..."
 
     container logger debug "Converting templates to LDIFs in ${source_dir} ..."
-    container envsubst-templates --quiet "${source_dir}"
+    container envsubst templates --quiet "${source_dir}"
 
     for file in $(find "${source_dir}" -type f -name \*.ldif | sort); do
         cp -frav "${file}" "${output_dir}" 2>&1 | container logger debug

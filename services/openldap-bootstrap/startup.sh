@@ -55,7 +55,7 @@ bootstrap_ldif() {
         group=$((10#${prefix} / 10))
 
         # group files by tens with no empty lines within a group.
-        # add a blank line between each group (e.g., between 120 and 200).
+        # add a blank line between each group (e.g., between 49 and 50).
         if [ -n "${prev_group}" ] && [ "${group}" -ne "${prev_group}" ]; then
             echo >> "${tmp_file}" # add empty line
         else
