@@ -4,6 +4,7 @@ services:
     image: osixia/openldap:1.5.0
     container_name: openldap
     environment:
+      #FQDN: "ldap-server.example.org"
       LDAP_LOG_LEVEL: "256"
       LDAP_ORGANISATION: "Example Inc."
       LDAP_DOMAIN: "example.org"
@@ -39,9 +40,10 @@ services:
     ports:
       - "389:389"
       - "636:636"
-    # For replication to work correctly, domainname and hostname must be
+    # For replication to work correctly, either domainname and hostname must be
     # set correctly so that "hostname"."domainname" equates to the
-    # fully-qualified domain name for the host.
+    # fully-qualified domain name for the host
+    # or the FQDN is provided directly as environment variable (see above).
     domainname: "example.org"
     hostname: "ldap-server"
   phpldapadmin:

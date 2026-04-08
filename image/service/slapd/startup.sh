@@ -567,8 +567,10 @@ ln -sf ${CONTAINER_SERVICE_DIR}/slapd/assets/ldap.conf /etc/ldap/ldap.conf
 # force OpenLDAP to listen on all interfaces
 # We need to make sure that /etc/hosts continues to include the
 # fully-qualified domain name and not just the specified hostname.
-# Without the FQDN, /bin/hostname --fqdn stops working.
-FQDN="$(/bin/hostname --fqdn)"
+if [ -z "$FQDN" ]; then
+  # Only call hostname if the fully qualified domain name wasn't provided as environment variable.
+  FQDN="$(/bin/hostname --fqdn)"
+fi
 if [ "$FQDN" != "$HOSTNAME" ]; then
     FQDN_PARAM="$FQDN"
 else
