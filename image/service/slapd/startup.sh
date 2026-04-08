@@ -576,6 +576,7 @@ else
 fi
 ETC_HOSTS=$(cat /etc/hosts | sed "/$HOSTNAME/d")
 echo "0.0.0.0 $FQDN_PARAM $HOSTNAME" > /etc/hosts
+echo ":: $FQDN_PARAM $HOSTNAME" >> /etc/hosts
 echo "$ETC_HOSTS" >> /etc/hosts
 
 exit 0
