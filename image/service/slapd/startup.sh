@@ -426,12 +426,14 @@ EOF
       echo "export PREVIOUS_LDAP_TLS_CRT_PATH=${LDAP_TLS_CRT_PATH}" >> $WAS_STARTED_WITH_TLS
       echo "export PREVIOUS_LDAP_TLS_KEY_PATH=${LDAP_TLS_KEY_PATH}" >> $WAS_STARTED_WITH_TLS
       echo "export PREVIOUS_LDAP_TLS_DH_PARAM_PATH=${LDAP_TLS_DH_PARAM_PATH}" >> $WAS_STARTED_WITH_TLS
+      chown openldap:openldap $WAS_STARTED_WITH_TLS
 
       # enforce TLS
       if [ "${LDAP_TLS_ENFORCE,,}" == "true" ]; then
         log-helper info "Add enforce TLS..."
         ldapmodify -Y EXTERNAL -Q -H ldapi:/// -f ${CONTAINER_SERVICE_DIR}/slapd/assets/config/tls/tls-enforce-enable.ldif 2>&1 | log-helper debug
         touch $WAS_STARTED_WITH_TLS_ENFORCE
+        chown openldap:openldap $WAS_STARTED_WITH_TLS_ENFORCE
 
       # disable tls enforcing (not possible for now)
       #else
@@ -519,6 +521,7 @@ EOF
 
     else
         touch "$WAS_ADMIN_PASSWORD_SET"
+        chown openldap:openldap "$WAS_ADMIN_PASSWORD_SET"
     fi
 
     #
@@ -559,6 +562,7 @@ EOF
   #
   log-helper info "First start is done..."
   touch $FIRST_START_DONE
+  chown openldap:openldap $FIRST_START_DONE
 fi
 
 ln -sf ${CONTAINER_SERVICE_DIR}/slapd/assets/.ldaprc $HOME/.ldaprc
