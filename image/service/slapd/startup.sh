@@ -456,7 +456,8 @@ EOF
     function disableReplication() {
       sed -i "s|{{ LDAP_BACKEND }}|${LDAP_BACKEND}|g" ${CONTAINER_SERVICE_DIR}/slapd/assets/config/replication/replication-disable.ldif
       ldapmodify -c -Y EXTERNAL -Q -H ldapi:/// -f ${CONTAINER_SERVICE_DIR}/slapd/assets/config/replication/replication-disable.ldif 2>&1 | log-helper debug || true
-      [[ -f "$WAS_STARTED_WITH_REPLICATION" ]] && rm -f "$WAS_STARTED_WITH_REPLICATION"
+      [[ -f "$WAS_STARTED_WITH_REPLICATION" ]] && rm -f "$WAS_STARTED_WITH_REPLICATION" && \
+        sed -i '/^# Add syncprov/,/^$/d' ${CONTAINER_SERVICE_DIR}/slapd/assets/config/replication/replication-enable.ldif
     }
 
     if [ "${LDAP_REPLICATION,,}" == "true" ]; then
@@ -464,14 +465,18 @@ EOF
       log-helper info "Add replication config..."
       disableReplication || true
 
-      i=1
+      i=0
+      LDAP_SERVER_ID_FROM=${LDAP_SERVER_ID_FROM:-1}
+      LDAP_CONFIG_REPL_ID_FROM=${LDAP_CONFIG_REPL_ID_FROM:-1}
+      LDAP_DB_REPL_ID_FROM=${LDAP_DB_REPL_ID_FROM:-101}
+      log-helper debug "$LDAP_REPLICATION_HOSTS"
       for host in $(complex-bash-env iterate LDAP_REPLICATION_HOSTS)
       do
-        sed -i "s|{{ LDAP_REPLICATION_HOSTS }}|olcServerID: $i ${!host}\n{{ LDAP_REPLICATION_HOSTS }}|g" ${CONTAINER_SERVICE_DIR}/slapd/assets/config/replication/replication-enable.ldif
-        sed -i "s|{{ LDAP_REPLICATION_HOSTS_CONFIG_SYNC_REPL }}|olcSyncRepl: rid=00$i provider=${!host} ${LDAP_REPLICATION_CONFIG_SYNCPROV}\n{{ LDAP_REPLICATION_HOSTS_CONFIG_SYNC_REPL }}|g" ${CONTAINER_SERVICE_DIR}/slapd/assets/config/replication/replication-enable.ldif
-        sed -i "s|{{ LDAP_REPLICATION_HOSTS_DB_SYNC_REPL }}|olcSyncRepl: rid=10$i provider=${!host} ${LDAP_REPLICATION_DB_SYNCPROV}\n{{ LDAP_REPLICATION_HOSTS_DB_SYNC_REPL }}|g" ${CONTAINER_SERVICE_DIR}/slapd/assets/config/replication/replication-enable.ldif
+        sed -i "s|{{ LDAP_REPLICATION_HOSTS }}|olcServerID: $((LDAP_SERVER_ID_FROM+i)) ${!host}\n{{ LDAP_REPLICATION_HOSTS }}|g" ${CONTAINER_SERVICE_DIR}/slapd/assets/config/replication/replication-enable.ldif
+        sed -i "s|{{ LDAP_REPLICATION_HOSTS_CONFIG_SYNC_REPL }}|olcSyncRepl: rid=$(printf %03d $((LDAP_CONFIG_REPL_ID_FROM+i))) provider=${!host} ${LDAP_REPLICATION_CONFIG_SYNCPROV}\n{{ LDAP_REPLICATION_HOSTS_CONFIG_SYNC_REPL }}|g" ${CONTAINER_SERVICE_DIR}/slapd/assets/config/replication/replication-enable.ldif
+        sed -i "s|{{ LDAP_REPLICATION_HOSTS_DB_SYNC_REPL }}|olcSyncRepl: rid=$(printf %03d $((LDAP_DB_REPL_ID_FROM+i))) provider=${!host} ${LDAP_REPLICATION_DB_SYNCPROV}\n{{ LDAP_REPLICATION_HOSTS_DB_SYNC_REPL }}|g" ${CONTAINER_SERVICE_DIR}/slapd/assets/config/replication/replication-enable.ldif
 
-        ((i++))
+        ((++i))
       done
 
       get_ldap_base_dn
@@ -519,6 +524,14 @@ EOF
 
     else
         touch "$WAS_ADMIN_PASSWORD_SET"
+    fi
+
+    if [[ -d  ${CONTAINER_SERVICE_DIR}/slapd/assets/config/extra ]]; then
+      log-helper info "Run extra ldif files..."
+      for f in $(find ${CONTAINER_SERVICE_DIR}/slapd/assets/config/extra -mindepth 1 -maxdepth 1 -type f -name \*.ldif | sort); do
+        log-helper debug "Processing file ${f}"
+        ldap_add_or_modify "$f"
+      done
     fi
 
     #
