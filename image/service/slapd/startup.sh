@@ -243,6 +243,7 @@ EOF
   # We have a database and config directory
   #
   else
+    log-helper info "Database and config directory have existing content"
 
     # try to detect if ldap backend is hdb but LDAP_BACKEND environment variable is mdb
     # due to default switch from hdb to mdb in 1.2.x
@@ -258,7 +259,7 @@ EOF
   fi
 
   if [ "${KEEP_EXISTING_CONFIG,,}" == "true" ]; then
-    log-helper info "/!\ KEEP_EXISTING_CONFIG = true configration will not be updated"
+    log-helper info "/!\ KEEP_EXISTING_CONFIG = true, configuration will not be updated"
   else
     #
     # start OpenLDAP
@@ -376,6 +377,8 @@ EOF
         ldap_add_or_modify "$f"
       done
 
+    else
+      log-helper info "Bootstrap was skipped"
     fi
 
     #
@@ -524,7 +527,7 @@ EOF
     #
     # stop OpenLDAP
     #
-    log-helper info "Stop OpenLDAP..."
+    log-helper info "Stopping OpenLDAP..."
 
     SLAPD_PID=$(cat /run/slapd/slapd.pid)
     kill -15 $SLAPD_PID
@@ -552,6 +555,8 @@ EOF
   if [ "${LDAP_REMOVE_CONFIG_AFTER_SETUP,,}" == "true" ]; then
     log-helper info "Remove config files..."
     rm -rf ${CONTAINER_SERVICE_DIR}/slapd/assets/config
+  else
+    log-helper info "Leaving config files..."
   fi
 
   #
