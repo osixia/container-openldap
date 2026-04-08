@@ -42,6 +42,25 @@ file_env 'LDAP_READONLY_USER_PASSWORD'
 [ -d /var/lib/ldap ] || mkdir -p /var/lib/ldap
 [ -d /etc/ldap/slapd.d ] || mkdir -p /etc/ldap/slapd.d
 
+if [ -z "$FQDN" ]; then
+  log-helper info "get FQDN from `hostname`"
+  # Only call hostname if the fully qualified domain name wasn't provided as environment variable.
+
+  FQDN="$(/bin/hostname --fqdn)"
+fi
+
+# force OpenLDAP to listen on all interfaces
+# We need to make sure that /etc/hosts continues to include the
+# fully-qualified domain name and not just the specified hostname.
+if [ "$FQDN" != "$HOSTNAME" ]; then
+    FQDN_PARAM="$FQDN"
+else
+    FQDN_PARAM=""
+fi
+ETC_HOSTS=$(cat /etc/hosts | sed "/$HOSTNAME/d")
+echo "0.0.0.0 $FQDN_PARAM $HOSTNAME" > /etc/hosts
+echo "$ETC_HOSTS" >> /etc/hosts
+
 log-helper info "openldap user and group adjustments"
 LDAP_OPENLDAP_UID=${LDAP_OPENLDAP_UID:-911}
 LDAP_OPENLDAP_GID=${LDAP_OPENLDAP_GID:-911}
@@ -305,11 +324,20 @@ EOF
 
     # start OpenLDAP
     log-helper info "Start OpenLDAP..."
-    # At this stage, we can just listen to ldap:// and ldap:// without naming any names
-    if log-helper level ge debug; then
-      slapd -h "ldap:/// ldapi:///" -u openldap -g openldap -d "$LDAP_LOG_LEVEL" 2>&1 &
+
+    # check if olcServerID has been configured before
+    if [ $(grep olcServerID /etc/ldap/slapd.d/'cn=config.ldif' | wc -l) -ne 0 ]; then
+      # yes, so we have to pass the FQDN to -h
+      SLAPD_H_ARG="ldap://$FQDN ldapi:///"
     else
-      slapd -h "ldap:/// ldapi:///" -u openldap -g openldap
+      # no, so we just listen to local connections
+      SLAPD_H_ARG="ldap:/// ldapi:///"
+    fi
+
+    if log-helper level ge debug; then
+      slapd -h "$SLAPD_H_ARG" -u openldap -g openldap -d "$LDAP_LOG_LEVEL" 2>&1 &
+    else
+      slapd -h "$SLAPD_H_ARG" -u openldap -g openldap
     fi
 
 
@@ -564,18 +592,5 @@ fi
 ln -sf ${CONTAINER_SERVICE_DIR}/slapd/assets/.ldaprc $HOME/.ldaprc
 ln -sf ${CONTAINER_SERVICE_DIR}/slapd/assets/ldap.conf /etc/ldap/ldap.conf
 
-# force OpenLDAP to listen on all interfaces
-# We need to make sure that /etc/hosts continues to include the
-# fully-qualified domain name and not just the specified hostname.
-# Without the FQDN, /bin/hostname --fqdn stops working.
-FQDN="$(/bin/hostname --fqdn)"
-if [ "$FQDN" != "$HOSTNAME" ]; then
-    FQDN_PARAM="$FQDN"
-else
-    FQDN_PARAM=""
-fi
-ETC_HOSTS=$(cat /etc/hosts | sed "/$HOSTNAME/d")
-echo "0.0.0.0 $FQDN_PARAM $HOSTNAME" > /etc/hosts
-echo "$ETC_HOSTS" >> /etc/hosts
 
 exit 0
