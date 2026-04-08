@@ -42,19 +42,20 @@ for schema in ${SCHEMAS} ; do
       continue
     fi
 
-    find . -name *\}${schema_name}.ldif -exec mv '{}' ./${ldif_file} \;
+    find . -name *\}${schema_name}.ldif | xargs -I {} mv '{}' ./${ldif_file}
 
-    # TODO: these sed invocations could all be combined
-    sed -i "/dn:/ c dn: cn=${schema_name},cn=schema,cn=config" ${ldif_file}
-    sed -i "/cn:/ c cn: ${schema_name}" ${ldif_file}
-    sed -i '/structuralObjectClass/ d' ${ldif_file}
-    sed -i '/entryUUID/ d' ${ldif_file}
-    sed -i '/creatorsName/ d' ${ldif_file}
-    sed -i '/createTimestamp/ d' ${ldif_file}
-    sed -i '/entryCSN/ d' ${ldif_file}
-    sed -i '/modifiersName/ d' ${ldif_file}
-    sed -i '/modifyTimestamp/ d' ${ldif_file}
-
+    # Strip ldif file off export metadata
+    sed -e "/dn:/ c dn: cn=${schema_name},cn=schema,cn=config" \
+    -e "/cn:/ c cn: ${schema_name}" \
+    -e '/structuralObjectClass/ d' \
+    -e '/entryUUID/ d' \
+    -e '/creatorsName/ d' \
+    -e '/createTimestamp/ d' \
+    -e '/entryCSN/ d' \
+    -e '/modifiersName/ d' \
+    -e '/modifyTimestamp/ d' \
+    -i ${ldif_file}
+    
     # slapd seems to be very sensitive to how a file ends. There should be no blank lines.
     sed -i '/^ *$/d' ${ldif_file}
 
