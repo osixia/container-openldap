@@ -46,10 +46,10 @@ bootstrap_ldif() {
 
     local prev_group=""
     local filename prefix group
-    for file in $(find "${tmp_dir}" -type f -name \*.ldif | sort); do
+    while IFS= read -r file; do
 
         container logger debug "Adding ${file} ..."
-        
+
         filename=$(basename "${file}")
         prefix=${filename%%-*}
         group=$((10#${prefix} / 10))
@@ -78,7 +78,7 @@ bootstrap_ldif() {
         cat "${file}" >> "${tmp_file}"
 
         prev_group="${group}"
-    done
+    done < <(find "${tmp_dir}" -type f -name "*.ldif" | sort)
 }
 
 bootstrap_database() {
