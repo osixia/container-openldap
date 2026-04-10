@@ -10,6 +10,7 @@
 ## Table of Contents
 
 - [Quick Start](#quick-start)
+- [Bootstrap best practice](#bootstrap-best-practice)
 - [Enable the readonly account](#enable-the-readonly-account)
 - [Enable TLS](#enable-tls)
 - [Enable replication](#enable-replication)
@@ -74,6 +75,59 @@ volumes:
 ```
 
 > Persisting `OPENLDAP_CONF_DIR` and `OPENLDAP_DATA_DIR` via volumes ensures data survives container restarts. Bootstrap only runs when the config directory is empty.
+
+---
+
+## Bootstrap best practice
+
+All `OPENLDAP_BOOTSTRAP_*` variables are **only read during the very first start**, when the config directory (`OPENLDAP_CONF_DIR`) is empty. On every subsequent start the configuration is loaded directly from the persisted `slapd.d` volume and the bootstrap variables are ignored entirely.
+
+This means you can — and should — remove sensitive variables (passwords in particular) from the container environment once initialisation is complete:
+
+**Step 1 — first start: bootstrap with all variables set**
+
+```yaml
+services:
+  openldap:
+    image: osixia/openldap:latest
+    ports:
+      - "3890:3890"
+    environment:
+      OPENLDAP_BOOTSTRAP_ORGANIZATION: "My Company"
+      OPENLDAP_BOOTSTRAP_SUFFIX: "dc=mycompany,dc=com"
+      OPENLDAP_BOOTSTRAP_CONFIG_ROOT_PASSWORD_HASHED: "{ARGON2}..."
+      OPENLDAP_BOOTSTRAP_DATA_ROOT_PASSWORD_HASHED: "{ARGON2}..."
+      # ... any other OPENLDAP_BOOTSTRAP_* variables
+    volumes:
+      - openldap-config:/etc/openldap/slapd.d
+      - openldap-data:/var/lib/openldap/openldap-data
+
+volumes:
+  openldap-config:
+  openldap-data:
+```
+
+**Step 2 — subsequent starts: drop all bootstrap variables**
+
+Once the container has started successfully and the volumes are populated, update your compose file to remove the `OPENLDAP_BOOTSTRAP_*` variables and redeploy:
+
+```yaml
+services:
+  openldap:
+    image: osixia/openldap:latest
+    ports:
+      - "3890:3890"
+    # No OPENLDAP_BOOTSTRAP_* variables — config is loaded from the volume
+    volumes:
+      - openldap-config:/etc/openldap/slapd.d
+      - openldap-data:/var/lib/openldap/openldap-data
+
+volumes:
+  openldap-config:
+  openldap-data:
+```
+
+> This pattern keeps credentials out of the running container environment and out of your production compose file, reducing the risk of accidental exposure through `docker inspect`, environment dumps, or container orchestration UIs.
 
 ---
 
