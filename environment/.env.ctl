@@ -5,3 +5,7 @@ OPENLDAP_CTL_PASSWORD_GENERATE_CMD="slappasswd -n -g; slappasswd -g"
 OPENLDAP_CTL_PASSWORD_HASH_CMD="slappasswd -h {ARGON2} -o module-path=${OPENLDAP_MODULES_DIR} -o module-load=argon2"
 
 OPENLDAP_CTL_SCHEMA2LDIF_DEPENDENCIES="core.schema cosine.schema inetorgperson.schema"
+
+OPENLDAP_CTL_LDAP_URI="ldap://localhost"
+OPENLDAP_CTL_LDAP_BINDDN="${OPENLDAP_BOOTSTRAP_DATA_ROOT_DN}"
+OPENLDAP_CTL_LDAP_BINDPW=""
