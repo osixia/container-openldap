@@ -2,7 +2,7 @@ module github.com/osixia/container-openldap/build
 
 go 1.25.0
 
-require github.com/osixia/container-baseimage/build v0.0.0-20260426195530-33e6c769a361
+require github.com/osixia/container-baseimage/build v0.0.0-20261007183720-dc9d7714269f
 
 require (
 	dagger.io/dagger v0.20.6 // indirect
@@ -23,9 +23,9 @@ require (
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.33 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/otel v1.43.0 // indirect
-	go.opentelemetry.io/otel/metric v1.43.0 // indirect
-	go.opentelemetry.io/otel/trace v1.43.0 // indirect
+	go.opentelemetry.io/otel v1.44.0 // indirect
+	go.opentelemetry.io/otel/metric v1.44.0 // indirect
+	go.opentelemetry.io/otel/trace v1.44.0 // indirect
 	go.uber.org/thriftrw v1.34.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.43.0 // indirect

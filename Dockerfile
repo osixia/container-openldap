@@ -1,4 +1,4 @@
-ARG BASE_IMAGE="osixia/baseimage:alpine-2.0.0-rc"
+ARG BASE_IMAGE="osixia/baseimage:alpine-2.0.0-rc2"
 FROM ${BASE_IMAGE}
 
 ARG IMAGE="osixia/openldap:develop"
@@ -12,7 +12,7 @@ RUN container groups add "${OPENLDAP_GROUP_GID}" ldap \
     && container users add "${OPENLDAP_USER_UID}" ldap --group-id "${OPENLDAP_GROUP_GID}" --group-name ldap
 
 # Set OpenLDAP version
-ARG OPENLDAP_VERSION=2.6.10-r0
+ARG OPENLDAP_VERSION=2.6.15-r0
 ENV OPENLDAP_VERSION="${OPENLDAP_VERSION}"
 
 # Install all OpenLDAP packages

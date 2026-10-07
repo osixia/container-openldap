@@ -48,6 +48,8 @@ Examples:
 - `40-a.ldif` + `49-b.ldif` => same ten-group (`4x`), concatenated directly.
 - `49-b.ldif` + `50-c.ldif` => group change (`4x` -> `5x`), one empty line inserted.
 
+Numeric prefixes are optional: names such as `schema.ldif` and `database.ldif` are accepted. Each file without a numeric prefix forms its own group, separated from other files by a blank line. Prefixes with leading zeros, such as `01-`, `08-`, and `09-`, are interpreted as decimal numbers.
+
 ## config/base
 
 Core OpenLDAP configuration applied on every bootstrap. Files are numbered to control load order:
@@ -83,6 +85,40 @@ Syncrepl-based multi-provider replication. Applied when `OPENLDAP_BOOTSTRAP_REPL
 
 Overlay load order matters for all overlays (not only replication). Keep dependencies in mind when choosing numeric prefixes. For replication specifically, keep Syncprov overlays loaded last (highest numeric prefixes, as in `180-...`) so they are initialized after other overlays.
 
-## custom directories
+## Custom directories
 
-Drop plain `.ldif` or `.ldif.template` files into `config/custom/` or `data/custom/` to inject arbitrary configuration or data during bootstrap. These are processed last, after all built-in files.
+Use these directories to customize the first initialization without rebuilding the image:
+
+| Directory inside the container | Content |
+|-------------------------------|---------|
+| `/container/services/openldap-bootstrap/assets/ldif/config/custom` | Configuration (`cn=config`): ACLs, indexes, overlays, and other settings |
+| `/container/services/openldap-bootstrap/assets/ldif/data/custom` | Initial directory entries: users, groups, and other LDAP data |
+
+Create local directories and mount them into the container:
+
+```bash
+mkdir -p custom-config custom-data
+```
+
+```bash
+docker run --name openldap \
+  -v "$(pwd)/custom-config:/container/services/openldap-bootstrap/assets/ldif/config/custom" \
+  -v "$(pwd)/custom-data:/container/services/openldap-bootstrap/assets/ldif/data/custom" \
+  osixia/openldap
+```
+
+Put `.ldif` files in these directories, or use `.ldif.template` files with `${VARIABLE}` placeholders to substitute environment variables. Leave the mounts writable so bootstrap can convert templates into `.ldif` files.
+
+There are three ways to customize the bootstrap:
+
+- **Add content:** use a new filename. For example, `custom-data/70-users.ldif` can contain user entries. Include a `dn:` and the required attributes for each entry, with a blank line between entries. Parent entries must come before their children.
+- **Replace a built-in fragment:** copy its file into the matching custom directory, keep the filename, and edit it. For example, copy `config/base/65-database-acl.ldif.template` into `custom-config/` to change the default ACLs, or `config/base/60-database.ldif.template` to change database settings and indexes.
+- **Remove a built-in fragment:** provide an empty `.ldif` file with the same output filename. For example, an empty `custom-config/65-database-acl.ldif` removes the rules from `65-database-acl.ldif.template`.
+
+Custom files are copied after built-in files, replacing files with the same output filename after template substitution. The resulting files are then assembled in numerical order, using the [prefix grouping rules](#numbered-prefix-grouping-behavior) above. For configuration, a fragment in the same ten-group can add attributes to an existing entry; a different group starts a new entry.
+
+Bootstrap imports the assembled entries with `slapadd`. Use entry attributes, without modification instructions such as `changetype: modify` or `replace: olcAccess`.
+
+Replacing one fragment leaves the others in place. For example, replacing `65-database-acl.ldif.template` keeps the final deny-all rule in `69-database-acl-close.ldif` and any ACLs added by enabled features such as read-only accounts or replication.
+
+Bootstrap runs only when both configuration and data directories are empty. This does not change an existing database.

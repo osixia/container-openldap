@@ -89,6 +89,10 @@ Arguments specified after `--` are forwarded to the slapd process inside the con
 docker run osixia/openldap -- -d -1
 ```
 
+**Customizing bootstrap configuration and data**
+
+To customize bootstrap configuration or initial data, see the [custom LDIF documentation](services/openldap-bootstrap/assets/ldif/README.md#custom-directories).
+
 **Debugging**
 
 To debug the container manually, you can start it with an interactive shell.
@@ -144,7 +148,7 @@ docker exec openldap container run -- openldap-ctl restore my-backup --force
 
 `--force` stops the OpenLDAP process if needed, deletes existing data in the target directories, restores the selected databases, then starts OpenLDAP again.
 
-You can also run a cron service to automatically perform regular backups:
+The cron service is disabled by default. To schedule regular backups, run it in a separate container alongside OpenLDAP, sharing its configuration, data, and backup volumes:
 
 ``` bash
 docker run --name openldap-cron \
