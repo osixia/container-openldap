@@ -1,6 +1,6 @@
 services:
   openldap:
-    image: osixia/openldap
+    image: osixia/openldap:2.6.15-beta
     container_name: openldap
     ports:
       - "389:3890"

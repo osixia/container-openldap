@@ -1,6 +1,6 @@
 services:
   ldap1:
-    image: osixia/openldap
+    image: osixia/openldap:2.6.15-beta
     container_name: ldap1
     hostname: ldap1.example.org
     networks:
@@ -21,7 +21,7 @@ services:
       - ldap1-backups:/var/lib/openldap/openldap-backups
 
   ldap2:
-    image: osixia/openldap
+    image: osixia/openldap:2.6.15-beta
     container_name: ldap2
     hostname: ldap2.example.org
     networks:

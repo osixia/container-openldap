@@ -35,6 +35,8 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Documentation
 
+- Pin documentation commands and Compose examples to `osixia/openldap:2.6.15-beta`.
+
 - Document the Postfix Book schema and its incompatibility with the `virtualMail` schema.
 - Improve the schema conversion example for local files and non-root execution.
 - List the schemas and modules available in the image, with their incompatibilities.
