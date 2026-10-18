@@ -1,0 +1,5 @@
+dn: ${OPENLDAP_BOOTSTRAP_REFINT_NOTHING_DN}
+objectClass: top
+objectClass: organizationalRole
+cn: ${OPENLDAP_BOOTSTRAP_REFINT_NOTHING_CN}
+description: Placeholder for empty groups maintained by refint; no authentication.

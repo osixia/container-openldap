@@ -22,6 +22,8 @@ After the shared version check, `tests/` runs integration scenarios on each buil
 
 - default bootstrap;
 - alternative schemas (`nis`, `virtualMail`);
+- refint empty-group placeholders: default behavior, automatic role creation
+  and deletion of the last real group member with memberof enabled;
 - all features with 3 replicated nodes: all compatible modules and schemas, TLS required,
   readonly users, monitor, ppolicy, unique, refint, memberof and multi-provider replication;
 - `openldap-ctl` backup and restore;

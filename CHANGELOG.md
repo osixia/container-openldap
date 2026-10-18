@@ -2,6 +2,16 @@
 
 Project-specific changes only. See upstream [OpenLDAP release notes](https://www.openldap.org/software/release/changes_lts.html).
 
+## Unreleased
+
+### Added
+
+- Add `OPENLDAP_BOOTSTRAP_REFINT_NOTHING_DN` to configure `olcRefintNothing` and
+  automatically bootstrap a passwordless replacement role for empty groups. An empty
+  DN disables both, preserving the default behavior.
+- Test default behavior, automatic role creation and preservation of a group after
+  deletion of its last real member.
+
 ## 2.6.15-beta
 
 ### Changed

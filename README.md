@@ -375,6 +375,7 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | -------------------------------------- | --------------------------------------------- | ----------------------------------- |
 | `OPENLDAP_BOOTSTRAP_REFINT`            | Enable the `refint` overlay during bootstrap  | `false`                             |
 | `OPENLDAP_BOOTSTRAP_REFINT_ATTRIBUTES` | Attributes maintained by the `refint` overlay | `member uniqueMember manager owner` |
+| `OPENLDAP_BOOTSTRAP_REFINT_NOTHING_DN` | Replacement DN for empty groups; automatically creates a passwordless role when set | `` |
 
 **PPolicy**
 

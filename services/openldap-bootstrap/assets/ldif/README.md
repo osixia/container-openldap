@@ -27,6 +27,7 @@ ldif/
     ├── database-readonly/ # Read-only account entry (OPENLDAP_BOOTSTRAP_DATA_READONLY=true)
     ├── monitor-readonly/  # Read-only monitor account (OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true)
     ├── ppolicy/           # Password policy group and default policy (OPENLDAP_BOOTSTRAP_PPOLICY=true)
+    ├── refint-nothing/    # Passwordless replacement role (REFINT enabled and NOTHING_DN set)
     ├── replication/       # Replication service accounts (OPENLDAP_BOOTSTRAP_REPLICATION=true)
     └── custom/            # User-provided data LDIF files
 ```
