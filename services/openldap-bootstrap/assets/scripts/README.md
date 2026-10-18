@@ -11,7 +11,7 @@ Scripts are executed in numeric order. Most are feature-gated by an environment 
 
 | Script | Trigger | Description |
 |--------|---------|-------------|
-| `00-base.sh` | always | Core bootstrap: password hashing for root DNs, module and schema setup, base LDIF files |
+| `00-base.sh` | always | Core bootstrap: password hashing for root DNs, module and schema setup, last successful bind settings, base LDIF files |
 | `10-tls.sh` | `OPENLDAP_BOOTSTRAP_TLS=true` | Applies TLS certificate and protocol configuration |
 | `15-tls-required.sh` | `OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true` | Enforces minimum 128-bit SSF (warns if TLS is not also enabled) |
 | `20-database-readonly.sh` | `OPENLDAP_BOOTSTRAP_DATA_READONLY=true` | Creates a read-only service account for the data database |

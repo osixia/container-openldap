@@ -65,7 +65,7 @@ Core OpenLDAP configuration applied on every bootstrap. Files are numbered to co
 | `40-frontend.ldif.template` | Frontend database (password hash algorithm) |
 | `50-config.ldif.template` | Config database (`olcDatabase=config`) with root DN and credentials |
 | `59-config-acl-close.ldif` | Closes config ACLs (deny all) |
-| `60-database.ldif.template` | Main data database (MDB backend) with indexes |
+| `60-database.ldif.template` | Main data database (MDB backend) with indexes and last successful bind settings |
 | `65-database-acl.ldif.template` | Data database ACLs (password self-service, basic attributes readable by authenticated users) |
 | `69-database-acl-close.ldif` | Closes data ACLs (deny all) |
 | `70-monitor.ldif.template` | Monitor database configuration |

@@ -22,6 +22,8 @@ After the shared version check, `tests/` runs integration scenarios on each buil
 
 - default bootstrap;
 - alternative schemas (`nis`, `virtualMail`);
+- last successful binds: disabled by default, precision throttling, failed binds
+  and compatibility with ppolicy;
 - refint empty-group placeholders: default behavior, automatic role creation
   and deletion of the last real group member with memberof enabled;
 - all features with 3 replicated nodes: all compatible modules and schemas, TLS required,

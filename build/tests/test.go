@@ -20,6 +20,7 @@ type scenario struct {
 var scenarios = []scenario{
 	{"default bootstrap", Default},
 	{"alternative schemas", AlternativeSchemas},
+	{"last successful binds", LastBind},
 	{"refint empty-group placeholders", RefintNothing},
 	{"all features with 3 replicated nodes", AllFeatures},
 	{"backup and restore", BackupRestore},
