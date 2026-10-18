@@ -25,6 +25,11 @@ mkdir -p /var/lib/openldap/openldap-backups
 chown ldap:ldap /var/lib/openldap/openldap-backups
 chmod 700 /var/lib/openldap/openldap-backups
 
+container log info "Creating default audit log directory /var/log/openldap ..."
+mkdir -p /var/log/openldap
+chown ldap:ldap /var/log/openldap
+chmod 700 /var/log/openldap
+
 container log info "Creating default ldapi socket directory ..."
 mkdir -p /var/lib/openldap/run
 chown -R ldap:ldap /var/lib/openldap/run

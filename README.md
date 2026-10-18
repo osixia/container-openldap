@@ -438,6 +438,13 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_BOOTSTRAP_REPLICATION_MEMBEROF`                  | Enable memberof settings in generated replication config               | `${OPENLDAP_BOOTSTRAP_MEMBEROF}`                                      |
 | `OPENLDAP_BOOTSTRAP_REPLICATION_MEMBEROF_SYNC_REPL`        | Extra `syncrepl` option used when `memberof` replication handling is enabled | `exattrs=${OPENLDAP_BOOTSTRAP_MEMBEROF_MEMBEROF_AD}`                  |
 
+**AuditLog**
+
+| Variable | Description | Default |
+| -------- | ----------- | ------- |
+| `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED` | Log successful LDAP writes; loads `auditlog.so` automatically | `false` |
+| `OPENLDAP_BOOTSTRAP_AUDITLOG_FILE` | Audit LDIF file; requires a writable parent directory | `/var/log/openldap/audit.ldif` |
+
 **Helpers and Maintenance**
 
 | Variable                                 | Description                                                 | Default                                                                                                                                                                          |

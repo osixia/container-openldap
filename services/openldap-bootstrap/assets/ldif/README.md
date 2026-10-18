@@ -16,6 +16,7 @@ ldif/
 │   ├── tls-required/      # Enforce TLS (OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true)
 │   ├── database-readonly/ # Read-only data DB user (OPENLDAP_BOOTSTRAP_DATA_READONLY=true)
 │   ├── monitor-readonly/  # Read-only monitor user (OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true)
+│   ├── auditlog/          # Audit file (OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED=true)
 │   ├── ppolicy/           # Password policy overlay (OPENLDAP_BOOTSTRAP_PPOLICY=true)
 │   ├── refint/            # Referential integrity overlay (OPENLDAP_BOOTSTRAP_REFINT=true)
 │   ├── unique/            # Unique attributes overlay (OPENLDAP_BOOTSTRAP_UNIQUE=true)

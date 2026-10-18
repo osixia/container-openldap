@@ -22,12 +22,13 @@ After the shared version check, `tests/` runs integration scenarios on each buil
 
 - default bootstrap;
 - alternative schemas (`nis`, `virtualMail`);
+- auditlog: automatic module loading, writes, custom paths, rotation and restarts;
 - last successful binds: disabled by default, precision throttling, failed binds
   and compatibility with ppolicy;
 - refint empty-group placeholders: default behavior, automatic role creation
   and deletion of the last real group member with memberof enabled;
 - all features with 3 replicated nodes: all compatible modules and schemas, TLS required,
-  readonly users, monitor, ppolicy, unique, refint, memberof and multi-provider replication;
+  readonly users, monitor, auditlog, ppolicy, unique, refint, memberof and multi-provider replication;
 - `openldap-ctl` backup and restore;
 - upgrade: pre-upgrade backup on a simulated N-1 image, restore on N, downgrade refused;
 - upgrade from previous published releases (`previousReleases` in `tests/upgrade.go`).

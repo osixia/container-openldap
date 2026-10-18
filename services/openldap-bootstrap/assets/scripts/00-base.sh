@@ -25,9 +25,17 @@ if [ "${TYPE}" = "env" ]; then
     ensure_hashed_password OPENLDAP_BOOTSTRAP_CONFIG_ROOT_PASSWORD_HASHED "config root"
     ensure_hashed_password OPENLDAP_BOOTSTRAP_DATA_ROOT_PASSWORD_HASHED "database root"
 
+    auditlog_module=false
     for module in ${OPENLDAP_BOOTSTRAP_MODULES}; do
         OPENLDAP_BOOTSTRAP_MODULES_LDIF+="olcModuleload: ${module}"$'\n'
+        case "${module##*/}" in
+            auditlog|auditlog.so|auditlog.la) auditlog_module=true ;;
+        esac
     done
+
+    if [ "${OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED}" = "true" ] && [ "${auditlog_module}" = "false" ]; then
+        OPENLDAP_BOOTSTRAP_MODULES_LDIF+="olcModuleload: auditlog.so"$'\n'
+    fi
 
     # schemas are included by path instead of by content: large schemas (e.g. msuser.ldif)
     # exceed the kernel size limit of a single environment variable and make every

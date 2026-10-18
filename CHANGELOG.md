@@ -6,6 +6,8 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Added
 
+- Add optional file-based auditing with `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED`
+  and `OPENLDAP_BOOTSTRAP_AUDITLOG_FILE`; load `auditlog.so` automatically when enabled.
 - Add `OPENLDAP_BOOTSTRAP_DATA_LAST_BIND` and `OPENLDAP_BOOTSTRAP_DATA_LAST_BIND_PRECISION`
   to track successful LDAP authentications in `pwdLastSuccess` (disabled by default).
 - Add `OPENLDAP_BOOTSTRAP_REFINT_NOTHING_DN` to configure `olcRefintNothing` and

@@ -124,10 +124,11 @@ func AllFeatures(ctx context.Context, client *dagger.Client, image *dagger.Conta
 		"OPENLDAP_BOOTSTRAP_TLS":          "true",
 		"OPENLDAP_BOOTSTRAP_TLS_REQUIRED": "true",
 
-		"OPENLDAP_BOOTSTRAP_REFINT":   "true",
-		"OPENLDAP_BOOTSTRAP_PPOLICY":  "true",
-		"OPENLDAP_BOOTSTRAP_UNIQUE":   "true",
-		"OPENLDAP_BOOTSTRAP_MEMBEROF": "true",
+		"OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED": "true",
+		"OPENLDAP_BOOTSTRAP_REFINT":           "true",
+		"OPENLDAP_BOOTSTRAP_PPOLICY":          "true",
+		"OPENLDAP_BOOTSTRAP_UNIQUE":           "true",
+		"OPENLDAP_BOOTSTRAP_MEMBEROF":         "true",
 
 		"OPENLDAP_BOOTSTRAP_REPLICATION":                        "true",
 		"OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS":                  strings.Join(hosts, " "),
