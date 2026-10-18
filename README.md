@@ -355,6 +355,8 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY`                 | Enable read-only monitor account creation                                         | `false`                                                     |
 | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY_DN`              | DN of the read-only monitor account                                               | `cn=readonly-monitor,${OPENLDAP_BOOTSTRAP_SUFFIX}`          |
 | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY_PASSWORD_HASHED` | Hashed password of the read-only monitor account; generated if empty when enabled | ``                                                          |
+| `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED` | Log successful LDAP writes; loads `auditlog.so` automatically | `false` |
+| `OPENLDAP_BOOTSTRAP_AUDITLOG_FILE` | Audit LDIF file; requires a writable parent directory | `/var/log/openldap/audit.ldif` |
 | `OPENLDAP_BOOTSTRAP_LDIF_CONFIG_DIR`                  | Source directory for config LDIF bootstrap files                                  | `/container/services/openldap-bootstrap/assets/ldif/config` |
 | `OPENLDAP_BOOTSTRAP_LDIF_DATA_DIR`                    | Source directory for data LDIF bootstrap files                                    | `/container/services/openldap-bootstrap/assets/ldif/data`   |
 | `OPENLDAP_BOOTSTRAP_SCRIPTS_DIR`                      | Source directory for bootstrap scripts                                            | `/container/services/openldap-bootstrap/assets/scripts`     |
@@ -437,13 +439,6 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_BOOTSTRAP_REPLICATION_TLS_SYNC_REPL`             | Extra `syncrepl` TLS options                                               | `starttls=critical tls_reqcert=demand`                                |
 | `OPENLDAP_BOOTSTRAP_REPLICATION_MEMBEROF`                  | Enable memberof settings in generated replication config               | `${OPENLDAP_BOOTSTRAP_MEMBEROF}`                                      |
 | `OPENLDAP_BOOTSTRAP_REPLICATION_MEMBEROF_SYNC_REPL`        | Extra `syncrepl` option used when `memberof` replication handling is enabled | `exattrs=${OPENLDAP_BOOTSTRAP_MEMBEROF_MEMBEROF_AD}`                  |
-
-**AuditLog**
-
-| Variable | Description | Default |
-| -------- | ----------- | ------- |
-| `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED` | Log successful LDAP writes; loads `auditlog.so` automatically | `false` |
-| `OPENLDAP_BOOTSTRAP_AUDITLOG_FILE` | Audit LDIF file; requires a writable parent directory | `/var/log/openldap/audit.ldif` |
 
 **Helpers and Maintenance**
 
