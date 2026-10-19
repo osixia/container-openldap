@@ -21,6 +21,8 @@ own native runner, then publishes them together from their OCI archives
 After the shared version check, `tests/` runs integration scenarios on each built image:
 
 - default bootstrap;
+- global request limits: native defaults, custom values and incoming message size
+  enforcement for anonymous and authenticated connections;
 - read-only bootstrap templates with projected-volume symlinks, custom overrides
   and temporary-copy cleanup on success and failure;
 - TLS certificate renewals: restart slapd on changed contents, ignore identical

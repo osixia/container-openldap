@@ -352,6 +352,11 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_BOOTSTRAP_GLOBAL_SIZE_LIMIT`                         | Global LDAP size limit                                                            | `500`                                                       |
 | `OPENLDAP_BOOTSTRAP_GLOBAL_TIME_LIMIT`                         | Global LDAP time limit                                                            | `120`                                                       |
 | `OPENLDAP_BOOTSTRAP_GLOBAL_IDLE_TIMEOUT`                       | Global LDAP idle timeout                                                          | `3600`                                                      |
+| `OPENLDAP_BOOTSTRAP_GLOBAL_WRITE_TIMEOUT` | Timeout for blocked network writes, in seconds (`0`: disabled) | `0` |
+| `OPENLDAP_BOOTSTRAP_GLOBAL_CONN_MAX_PENDING` | Maximum pending requests per anonymous connection | `100` |
+| `OPENLDAP_BOOTSTRAP_GLOBAL_CONN_MAX_PENDING_AUTH` | Maximum pending requests per authenticated connection | `1000` |
+| `OPENLDAP_BOOTSTRAP_GLOBAL_SOCKBUF_MAX_INCOMING` | Maximum incoming LDAP message size for anonymous connections, in bytes | `262143` |
+| `OPENLDAP_BOOTSTRAP_GLOBAL_SOCKBUF_MAX_INCOMING_AUTH` | Maximum incoming LDAP message size for authenticated connections, in bytes | `4194303` |
 | `OPENLDAP_BOOTSTRAP_FRONTEND_PASSWORD_HASH`                      | Password hash scheme configured in `olcPasswordHash`                              | `{ARGON2}`                                                  |
 | `OPENLDAP_BOOTSTRAP_CONFIG_ROOT_DN`                   | Root DN for `cn=config`                                                           | `cn=admin,cn=config`                                        |
 | `OPENLDAP_BOOTSTRAP_CONFIG_ROOT_PASSWORD_HASHED`      | Hashed password for `cn=config`; generated if empty                               | ``                                                          |

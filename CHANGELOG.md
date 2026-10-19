@@ -6,6 +6,8 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Added
 
+- Expose bootstrap settings for pending request limits, incoming LDAP message sizes
+  and blocked network write timeouts, preserving OpenLDAP defaults.
 - Add `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MIN_DELAY` and `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_DELAY`
   for progressive per-account lockouts after failed authentications (disabled by default).
 - Add `openldap-ctl password hash --file` and `--stdin` to hash secrets without

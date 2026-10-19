@@ -59,7 +59,7 @@ Core OpenLDAP configuration applied on every bootstrap. Files are numbered to co
 
 | File | Description |
 |------|-------------|
-| `00-global.ldif.template` | Global limits (size, time, idle timeout) |
+| `00-global.ldif.template` | Global search limits, idle/write timeouts, pending requests and incoming message sizes |
 | `10-module.ldif.template` | Module path and module list (`auto` or explicit order) |
 | `20-schema.ldif` | Schema configuration container |
 | `30-schema-import.ldif.template` | Additional schemas to load |
