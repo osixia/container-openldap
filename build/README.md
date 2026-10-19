@@ -21,6 +21,8 @@ own native runner, then publishes them together from their OCI archives
 After the shared version check, `tests/` runs integration scenarios on each built image:
 
 - default bootstrap;
+- read-only bootstrap templates with projected-volume symlinks, custom overrides
+  and temporary-copy cleanup on success and failure;
 - alternative schemas (`nis`, `virtualMail`);
 - auditlog: automatic module loading, writes, custom paths, rotation and restarts;
 - last successful binds: disabled by default, precision throttling, failed binds

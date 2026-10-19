@@ -33,6 +33,7 @@ prepare_ldif_files() {
 
     local source_dir="$1"
     local output_dir="$2"
+    local work_dir
 
     if [ ! -d "${source_dir}" ]; then
         container log debug "Directory not found: ${source_dir}"
@@ -41,13 +42,23 @@ prepare_ldif_files() {
 
     container log info "Load ${source_dir} LDIFs ..."
 
-    container log debug "Converting templates to LDIFs in ${source_dir} ..."
-    container envsubst templates "${source_dir}" 2>&1 | container log debug
+    work_dir=$(mktemp -d "${output_dir}/.templates.XXXXXX")
+    # output_dir is inside BOOTSTRAP_TMP_DIR, whose EXIT trap also cleans up
+    # this working copy if any command below fails.
+
+    # Dereference projected-volume symlinks and make read-only sources writable
+    # only in the working copy.
+    cp -RL "${source_dir}/." "${work_dir}"
+    chmod -R u+rwX "${work_dir}"
+
+    container log debug "Converting templates to LDIFs in ${work_dir} ..."
+    container envsubst templates "${work_dir}" 2>&1 | container log debug
 
     while IFS= read -r file; do
         cp -frav "${file}" "${output_dir}" 2>&1 | container log debug
-    done < <(find "${source_dir}" -type f -name "*.ldif" | sort -V)
+    done < <(find "${work_dir}" -type f -name "*.ldif" | sort -V)
 
+    rm -rf "${work_dir:?}"
 }
 
 get_dn_attr() {

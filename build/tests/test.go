@@ -19,6 +19,7 @@ type scenario struct {
 
 var scenarios = []scenario{
 	{"default bootstrap", Default},
+	{"read-only bootstrap templates", ReadOnlyTemplates},
 	{"alternative schemas", AlternativeSchemas},
 	{"audit logging", AuditLog},
 	{"last successful binds", LastBind},

@@ -16,6 +16,11 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 - Test default behavior, automatic role creation and preservation of a group after
   deletion of its last real member.
 
+### Fixed
+
+- Render bootstrap LDIF templates in a temporary writable copy, allowing read-only
+  sources and Kubernetes projected-volume symlinks without modifying source files.
+
 ## 2.6.15-beta
 
 ### Changed

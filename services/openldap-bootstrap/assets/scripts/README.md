@@ -35,7 +35,7 @@ Utility functions shared across the bootstrap scripts.
 |----------|-------------|
 | `check_args` | Validates that a script was called with the expected operation (`env`/`ldif`) and argument count |
 | `prepare_env_file` | Appends exported variable assignments (safely shell-quoted) to an env file |
-| `prepare_ldif_files` | Renders `.ldif.template` files via `container envsubst templates` and copies all resulting `.ldif` files (sorted) to the output directory |
+| `prepare_ldif_files` | Copies sources to a temporary writable directory (dereferencing symlinks), renders `.ldif.template` files via `container envsubst templates`, then copies all resulting `.ldif` files (sorted) to the output directory. Sources can be mounted read-only. The function removes its working copy on success; the bootstrap's global EXIT trap cleans up on failure. |
 | `get_dn_attr` | Extracts the value of a named attribute from a DN string (e.g. `cn` from `cn=admin,dc=example,dc=com`) |
 
 ### `helpers/password.sh`

@@ -15,6 +15,15 @@ const replicationPassword = `Repl passw0rd 'single' \ $HOME`
 
 const defaultSchemas = "core.ldif cosine.ldif inetorgperson.ldif rfc2307bis.ldif"
 
+//go:embed testdata/templates.sh
+var templatesCheck string
+
+// ReadOnlyTemplates checks projected-volume sources and temporary-copy cleanup.
+func ReadOnlyTemplates(ctx context.Context, client *dagger.Client, image *dagger.Container) error {
+	_, err := expect(ctx, image, true, nil, "container", "run", "--", "bash", "-c", templatesCheck)
+	return err
+}
+
 // allSchemas can be loaded together. Excluded:
 //   - nis.ldif and virtualMail.ldif conflict with rfc2307bis.ldif and postfix-book.ldif,
 //     they are tested by AlternativeSchemas;
