@@ -25,6 +25,7 @@ var scenarios = []scenario{
 	{"automatic module loading", AutomaticModules},
 	{"audit logging", AuditLog},
 	{"last successful binds", LastBind},
+	{"password policy inactivity", PasswordPolicyIdle},
 	{"refint empty-group placeholders", RefintNothing},
 	{"all features with 3 replicated nodes", AllFeatures},
 	{"backup and restore", BackupRestore},

@@ -405,6 +405,7 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT`                | Value for `pwdLockout`                                  | `true`                                             |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT_DURATION`       | Value for `pwdLockoutDuration`                          | `900`                                              |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_AGE`                | Value for `pwdMaxAge`                                   | `7776000`                                          |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_IDLE`               | Maximum inactivity in seconds (`0`: disabled); requires last bind tracking and policy lockout | `0` |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_EXPIRE_WARNING`         | Value for `pwdExpireWarning`                            | `1209600`                                          |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_GRACE_AUTH_NLIMIT`      | Value for `pwdGraceAuthNLimit`                          | `3`                                                |
 

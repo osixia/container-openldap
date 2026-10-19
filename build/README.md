@@ -31,6 +31,8 @@ After the shared version check, `tests/` runs integration scenarios on each buil
 - auditlog: automatic module loading, writes, custom paths, rotation and restarts;
 - last successful binds: disabled by default, precision throttling, failed binds
   and compatibility with ppolicy;
+- password policy inactivity: disabled by default, active and idle accounts,
+  first logins and missing prerequisites;
 - refint empty-group placeholders: default behavior, automatic role creation
   and deletion of the last real group member with memberof enabled;
 - all features with 3 replicated nodes: all compatible modules and schemas, TLS required,

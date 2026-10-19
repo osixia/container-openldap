@@ -75,6 +75,12 @@ Core OpenLDAP configuration applied on every bootstrap. Files are numbered to co
 
 ACL files ending in `-close.ldif` append a final `access to * by * none` rule to deny any unmatched access, ensuring a safe default.
 
+## data/ppolicy
+
+`50-ppolicy-policy.ldif.template` sets the default password policy, including
+`pwdMaxIdle` in seconds (`0`: disabled). Positive values require
+`OPENLDAP_BOOTSTRAP_DATA_LAST_BIND=true` and `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT=true`.
+
 ## config/replication
 
 Syncrepl-based multi-provider replication. Applied when `OPENLDAP_BOOTSTRAP_REPLICATION=true`.

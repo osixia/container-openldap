@@ -6,6 +6,8 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Added
 
+- Add `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_IDLE` to reject logins after a
+  configurable period of inactivity (disabled by default).
 - Add optional `openldap-tls-reload` service to restart slapd after TLS file
   contents change, ignoring duplicate events and unchanged projected volumes.
 - Default `OPENLDAP_BOOTSTRAP_MODULES` to `auto` to load base and enabled feature

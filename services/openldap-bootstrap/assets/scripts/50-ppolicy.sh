@@ -20,6 +20,15 @@ if [ "${OPENLDAP_BOOTSTRAP_PPOLICY}" = "true" ]; then
     if [ "${TYPE}" = "env" ]; then
         ENV_FILE="$2"
 
+        if [ "${OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_IDLE}" -gt 0 ]; then
+            if [ "${OPENLDAP_BOOTSTRAP_DATA_LAST_BIND^^}" != "TRUE" ]; then
+                container log fatal "OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_IDLE requires OPENLDAP_BOOTSTRAP_DATA_LAST_BIND=true"
+            fi
+            if [ "${OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT^^}" != "TRUE" ]; then
+                container log fatal "OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_IDLE requires OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT=true"
+            fi
+        fi
+
         OPENLDAP_BOOTSTRAP_PPOLICY_HASH_CLEAR_TEXT=${OPENLDAP_BOOTSTRAP_PPOLICY_HASH_CLEAR_TEXT^^}
         OPENLDAP_BOOTSTRAP_PPOLICY_USE_LOCKOUT=${OPENLDAP_BOOTSTRAP_PPOLICY_USE_LOCKOUT^^}
 
