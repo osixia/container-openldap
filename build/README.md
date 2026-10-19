@@ -44,6 +44,9 @@ After the shared version check, `tests/` runs integration scenarios on each buil
 - `openldap-ctl` backup and restore;
 - password hashing: arguments, secret files and stdin, exact contents, custom hash
   commands and trace output without file/stdin secrets;
+- LDIF validation: syntax, required attributes, value syntax and suffix checks,
+  multiple files, recursive directories and projected-volume symlinks, with unchanged
+  configuration and data while slapd is stopped or running;
 - upgrade: pre-upgrade backup on a simulated N-1 image, restore on N, downgrade refused;
 - upgrade from previous published releases (`previousReleases` in `tests/upgrade.go`).
 

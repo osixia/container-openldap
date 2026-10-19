@@ -29,6 +29,7 @@ var scenarios = []scenario{
 	{"password policy inactivity", PasswordPolicyIdle},
 	{"progressive password policy lockouts", PasswordPolicyDelay},
 	{"password helpers", PasswordHelpers},
+	{"LDIF validation", ValidateLDIF},
 	{"refint empty-group placeholders", RefintNothing},
 	{"all features with 3 replicated nodes", AllFeatures},
 	{"backup and restore", BackupRestore},

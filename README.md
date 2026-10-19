@@ -25,6 +25,7 @@
   - [🔁 Replication](#-replication)
   - [🛠️ LDAP Toolkit](#️-ldap-toolkit)
     - [OpenLDAP Utilities](#openldap-utilities)
+    - [Validate LDIF](#validate-ldif)
     - [Password Helpers](#password-helpers)
     - [Convert Schema to LDIF](#convert-schema-to-ldif)
   - [🔤 Environment Variables](#-environment-variables)
@@ -292,6 +293,21 @@ docker run --rm osixia/openldap:2.6.15-beta run -- \
   -D "cn=admin,dc=example,dc=org" -w passw0rd \
   -s newpassword "uid=jdoe,ou=people,dc=example,dc=org"
 ```
+
+### Validate LDIF
+
+Check data entries against the initialized local configuration without importing them or stopping slapd:
+
+```bash
+docker exec openldap container run -- openldap-ctl validate-ldif /data/users.ldif
+docker exec openldap container run -- openldap-ctl validate-ldif /data/users.ldif /data/groups.ldif
+docker exec openldap container run -- openldap-ctl validate-ldif /data/ldif/
+```
+
+Directories are searched recursively for `*.ldif`, sorted by version and excluding hidden paths.
+Each file must contain complete entries. All files are checked; any validation failure returns a non-zero status.
+Checks LDIF syntax, attribute values and schemas. Does not check existing entries,
+ACLs or overlay rules, and does not accept `ldapmodify` change records.
 
 ### Password Helpers
 

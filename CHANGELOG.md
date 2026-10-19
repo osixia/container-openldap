@@ -6,6 +6,8 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Added
 
+- Add `openldap-ctl validate-ldif` for files and directories to check data entry LDIF
+  syntax, values and schemas without importing entries or stopping slapd.
 - Expose bootstrap settings for pending request limits, incoming LDAP message sizes
   and blocked network write timeouts, preserving OpenLDAP defaults.
 - Add `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MIN_DELAY` and `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_DELAY`
