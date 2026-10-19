@@ -307,6 +307,16 @@ Hash a password:
 docker run --rm osixia/openldap:2.6.15-beta run -- openldap-ctl password hash passw0rd
 ```
 
+Read a password from a mounted secret or standard input:
+
+```bash
+docker exec openldap container run -- openldap-ctl password hash --file /run/secrets/password
+docker exec -i openldap container run -- openldap-ctl password hash --stdin < password.txt
+```
+
+Contents are hashed exactly, including trailing newlines. Use `hash -- password`
+for a literal password named `--file`, `--stdin` or `--`.
+
 ### Convert Schema to LDIF
 
 ``` bash
@@ -450,7 +460,7 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_CTL_BACKUP_CONFIG_FILE_SUFFIX` | Suffix used for config backups                              | `-config.gz`                                                                                                                                                                     |
 | `OPENLDAP_CTL_BACKUP_DATA_FILE_SUFFIX`   | Suffix used for data backups                                | `-data.gz`                                                                                                                                                                       |
 | `OPENLDAP_CTL_PASSWORD_GENERATE_CMD`     | Command used by `openldap-ctl password generate`            | `slappasswd -n -g; slappasswd -g`                                                                                                                                                |
-| `OPENLDAP_CTL_PASSWORD_HASH_CMD`         | Command used by `openldap-ctl password hash`                | `slappasswd -h {ARGON2} -o module-path=${OPENLDAP_MODULES_DIR} -o module-load=argon2`                                                                                            |
+| `OPENLDAP_CTL_PASSWORD_HASH_CMD`         | Hash command accepting slappasswd options `-s` and `-T`     | `slappasswd -h {ARGON2} -o module-path=${OPENLDAP_MODULES_DIR} -o module-load=argon2`                                                                                            |
 | `OPENLDAP_CTL_SCHEMA2LDIF_DEPENDENCIES`  | Default schema dependencies for `schema2ldif`               | `core.schema cosine.schema inetorgperson.schema`                                                                                                                                 |
 | `OPENLDAP_CRON_JOB`                      | Cron job used by the backup service                         | `15 2 * * * PATH=${PATH} container run -- openldap-ctl backup "openldap-cron-$(date -I)-${OPENLDAP_VERSION}" --clean 15 --clean-prefix openldap-cron-` |
 | `OPENLDAP_UPGRADE_FORCE`                 | Allow upgrade bypasses, including forced downgrade handling | `false`                                                                                                                                                                          |

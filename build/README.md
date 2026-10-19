@@ -38,6 +38,8 @@ After the shared version check, `tests/` runs integration scenarios on each buil
 - all features with 3 replicated nodes: all compatible modules and schemas, TLS required,
   readonly users, monitor, auditlog, ppolicy, unique, refint, memberof and multi-provider replication;
 - `openldap-ctl` backup and restore;
+- password hashing: arguments, secret files and stdin, exact contents, custom hash
+  commands and trace output without file/stdin secrets;
 - upgrade: pre-upgrade backup on a simulated N-1 image, restore on N, downgrade refused;
 - upgrade from previous published releases (`previousReleases` in `tests/upgrade.go`).
 

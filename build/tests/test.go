@@ -26,6 +26,7 @@ var scenarios = []scenario{
 	{"audit logging", AuditLog},
 	{"last successful binds", LastBind},
 	{"password policy inactivity", PasswordPolicyIdle},
+	{"password helpers", PasswordHelpers},
 	{"refint empty-group placeholders", RefintNothing},
 	{"all features with 3 replicated nodes", AllFeatures},
 	{"backup and restore", BackupRestore},
