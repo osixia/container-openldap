@@ -337,7 +337,7 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | ----------------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------- |
 | `OPENLDAP_BOOTSTRAP_ORGANIZATION`                     | Organization name used in bootstrap data                                          | `Example Org`                                               |
 | `OPENLDAP_BOOTSTRAP_SUFFIX`                           | Base LDAP suffix; must start with `dc=`                                           | `dc=example,dc=org`                                         |
-| `OPENLDAP_BOOTSTRAP_MODULES`                          | OpenLDAP modules loaded during bootstrap                                          | `back_mdb.so argon2.so ppolicy.so unique.so refint.so memberof.so syncprov.so` |
+| `OPENLDAP_BOOTSTRAP_MODULES` | `auto`: base and enabled feature modules; an explicit list sets the exact modules and order | `auto` |
 | `OPENLDAP_BOOTSTRAP_SCHEMAS`                          | LDIF schemas imported during bootstrap                                            | `core.ldif cosine.ldif inetorgperson.ldif rfc2307bis.ldif`  |
 | `OPENLDAP_BOOTSTRAP_GLOBAL_SIZE_LIMIT`                         | Global LDAP size limit                                                            | `500`                                                       |
 | `OPENLDAP_BOOTSTRAP_GLOBAL_TIME_LIMIT`                         | Global LDAP time limit                                                            | `120`                                                       |
@@ -357,7 +357,7 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY`                 | Enable read-only monitor account creation                                         | `false`                                                     |
 | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY_DN`              | DN of the read-only monitor account                                               | `cn=readonly-monitor,${OPENLDAP_BOOTSTRAP_SUFFIX}`          |
 | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY_PASSWORD_HASHED` | Hashed password of the read-only monitor account; generated if empty when enabled | ``                                                          |
-| `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED` | Log successful LDAP writes; loads `auditlog.so` automatically | `false` |
+| `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED` | Log successful LDAP writes | `false` |
 | `OPENLDAP_BOOTSTRAP_AUDITLOG_FILE` | Audit LDIF file; requires a writable parent directory | `/var/log/openldap/audit.ldif` |
 | `OPENLDAP_BOOTSTRAP_LDIF_CONFIG_DIR`                  | Source directory for config LDIF bootstrap files                                  | `/container/services/openldap-bootstrap/assets/ldif/config` |
 | `OPENLDAP_BOOTSTRAP_LDIF_DATA_DIR`                    | Source directory for data LDIF bootstrap files                                    | `/container/services/openldap-bootstrap/assets/ldif/data`   |

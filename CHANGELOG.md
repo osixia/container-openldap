@@ -8,8 +8,10 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 - Add optional `openldap-tls-reload` service to restart slapd after TLS file
   contents change, ignoring duplicate events and unchanged projected volumes.
+- Default `OPENLDAP_BOOTSTRAP_MODULES` to `auto` to load base and enabled feature
+  modules; explicit lists retain full control over module selection and order.
 - Add optional file-based auditing with `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED`
-  and `OPENLDAP_BOOTSTRAP_AUDITLOG_FILE`; load `auditlog.so` automatically when enabled.
+  and `OPENLDAP_BOOTSTRAP_AUDITLOG_FILE`.
 - Add `OPENLDAP_BOOTSTRAP_DATA_LAST_BIND` and `OPENLDAP_BOOTSTRAP_DATA_LAST_BIND_PRECISION`
   to track successful LDAP authentications in `pwdLastSuccess` (disabled by default).
 - Add `OPENLDAP_BOOTSTRAP_REFINT_NOTHING_DN` to configure `olcRefintNothing` and

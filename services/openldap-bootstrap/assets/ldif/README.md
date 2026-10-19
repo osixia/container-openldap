@@ -60,7 +60,7 @@ Core OpenLDAP configuration applied on every bootstrap. Files are numbered to co
 | File | Description |
 |------|-------------|
 | `00-global.ldif.template` | Global limits (size, time, idle timeout) |
-| `10-module.ldif.template` | Module path and dynamic module list |
+| `10-module.ldif.template` | Module path and module list (`auto` or explicit order) |
 | `20-schema.ldif` | Schema configuration container |
 | `30-schema-import.ldif.template` | Additional schemas to load |
 | `40-frontend.ldif.template` | Frontend database (password hash algorithm) |

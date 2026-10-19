@@ -22,6 +22,7 @@ var scenarios = []scenario{
 	{"read-only bootstrap templates", ReadOnlyTemplates},
 	{"alternative schemas", AlternativeSchemas},
 	{"TLS certificate reload", TLSReload},
+	{"automatic module loading", AutomaticModules},
 	{"audit logging", AuditLog},
 	{"last successful binds", LastBind},
 	{"refint empty-group placeholders", RefintNothing},

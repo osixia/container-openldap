@@ -27,6 +27,7 @@ After the shared version check, `tests/` runs integration scenarios on each buil
   projected volumes and duplicate events, and preserve intentional service stops;
   run bootstrap, schema conversion and TLS renewals with `/tmp` mounted read-only;
 - alternative schemas (`nis`, `virtualMail`);
+- automatic modules: feature flags, replication, exact custom ordering and aliases;
 - auditlog: automatic module loading, writes, custom paths, rotation and restarts;
 - last successful binds: disabled by default, precision throttling, failed binds
   and compatibility with ppolicy;

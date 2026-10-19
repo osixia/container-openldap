@@ -26,9 +26,9 @@ func AuditLog(ctx context.Context, client *dagger.Client, image *dagger.Containe
 			settings["OPENLDAP_BOOTSTRAP_AUDITLOG_FILE"] = file
 		}
 		if mode == "minimal" || mode == "explicit" {
-			settings["OPENLDAP_BOOTSTRAP_MODULES"] = "back_mdb.so argon2.so"
+			settings["OPENLDAP_BOOTSTRAP_MODULES"] = "back_mdb.so argon2.so auditlog.so"
 			if mode == "explicit" {
-				settings["OPENLDAP_BOOTSTRAP_MODULES"] += " /usr/lib/openldap/auditlog.so"
+				settings["OPENLDAP_BOOTSTRAP_MODULES"] = "back_mdb.so argon2.so /usr/lib/openldap/auditlog.so"
 			}
 		}
 		if err := check(ctx, withEnv(image, merge(passwords, settings)), nil, env{
