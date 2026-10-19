@@ -33,6 +33,8 @@ After the shared version check, `tests/` runs integration scenarios on each buil
   and compatibility with ppolicy;
 - password policy inactivity: disabled by default, active and idle accounts,
   first logins and missing prerequisites;
+- progressive password policy lockouts: disabled by default, doubling and cap,
+  recovery, independent accounts and compatibility with the fixed lockout threshold;
 - refint empty-group placeholders: default behavior, automatic role creation
   and deletion of the last real group member with memberof enabled;
 - all features with 3 replicated nodes: all compatible modules and schemas, TLS required,

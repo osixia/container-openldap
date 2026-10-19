@@ -81,6 +81,10 @@ ACL files ending in `-close.ldif` append a final `access to * by * none` rule to
 `pwdMaxIdle` in seconds (`0`: disabled). Positive values require
 `OPENLDAP_BOOTSTRAP_DATA_LAST_BIND=true` and `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT=true`.
 
+`pwdMinDelay` and `pwdMaxDelay` configure progressive per-account lockouts after
+failed binds (`0`/`0`: disabled). Successful authentication resets the progression;
+`pwdMaxFailure` and `pwdLockoutDuration` still apply when the failure threshold is reached.
+
 ## config/replication
 
 Syncrepl-based multi-provider replication. Applied when `OPENLDAP_BOOTSTRAP_REPLICATION=true`.
