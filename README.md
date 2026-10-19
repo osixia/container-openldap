@@ -185,6 +185,8 @@ docker run --name openldap --hostname ldap.example.org -p 389:3890 -p 636:6360 \
 
 If you also set `OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true`, bootstrap adds TLS-required access rules. That setting is stricter than plain TLS enablement and is intended for deployments where non-TLS client access should be rejected.
 
+The optional `openldap-tls-reload` service restarts slapd when certificate contents change. See [certificate renewal](https://opensource.osixia.net/projects/container-images/openldap/tls/#renewing-certificates).
+
 ## 🔁 Replication
 
 Set `OPENLDAP_BOOTSTRAP_REPLICATION=true` to bootstrap syncrepl replication.

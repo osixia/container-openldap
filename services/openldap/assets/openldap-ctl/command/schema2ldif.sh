@@ -18,8 +18,8 @@ fi
 SCHEMAS=$1
 DEPENDENCIES=${2:-${OPENLDAP_CTL_SCHEMA2LDIF_DEPENDENCIES}}
 
-TMP_DIR=$(mktemp -d)
-TMP_FILE=$(mktemp)
+TMP_DIR=$(mktemp -d /run/container/tmp/openldap-schema.XXXXXX)
+TMP_FILE=$(mktemp /run/container/tmp/openldap-schema-config.XXXXXX)
 
 cleanup() {
   rm -rf "${TMP_DIR}"

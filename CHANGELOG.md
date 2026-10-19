@@ -6,6 +6,8 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Added
 
+- Add optional `openldap-tls-reload` service to restart slapd after TLS file
+  contents change, ignoring duplicate events and unchanged projected volumes.
 - Add optional file-based auditing with `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED`
   and `OPENLDAP_BOOTSTRAP_AUDITLOG_FILE`; load `auditlog.so` automatically when enabled.
 - Add `OPENLDAP_BOOTSTRAP_DATA_LAST_BIND` and `OPENLDAP_BOOTSTRAP_DATA_LAST_BIND_PRECISION`
@@ -18,6 +20,8 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Fixed
 
+- Create bootstrap, schema conversion and TLS watcher temporary files under
+  `/run/container/tmp` instead of relying on a writable `/tmp`.
 - Render bootstrap LDIF templates in a temporary writable copy, allowing read-only
   sources and Kubernetes projected-volume symlinks without modifying source files.
 

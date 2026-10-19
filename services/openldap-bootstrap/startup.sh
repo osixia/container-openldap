@@ -16,7 +16,7 @@ fi
 
 container log info "Bootstrapping OpenLDAP ..."
 
-BOOTSTRAP_TMP_DIR="$(mktemp -d)"
+BOOTSTRAP_TMP_DIR="$(mktemp -d /run/container/tmp/openldap-bootstrap.XXXXXX)"
 trap 'rm -rf "${BOOTSTRAP_TMP_DIR}"' EXIT
 
 bootstrap_env() {

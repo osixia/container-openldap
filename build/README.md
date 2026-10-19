@@ -23,6 +23,9 @@ After the shared version check, `tests/` runs integration scenarios on each buil
 - default bootstrap;
 - read-only bootstrap templates with projected-volume symlinks, custom overrides
   and temporary-copy cleanup on success and failure;
+- TLS certificate renewals: restart slapd on changed contents, ignore identical
+  projected volumes and duplicate events, and preserve intentional service stops;
+  run bootstrap, schema conversion and TLS renewals with `/tmp` mounted read-only;
 - alternative schemas (`nis`, `virtualMail`);
 - auditlog: automatic module loading, writes, custom paths, rotation and restarts;
 - last successful binds: disabled by default, precision throttling, failed binds
