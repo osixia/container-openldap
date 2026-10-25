@@ -442,6 +442,14 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_EXPIRE_WARNING`         | Value for `pwdExpireWarning`                            | `1209600`                                          |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_GRACE_AUTH_NLIMIT`      | Value for `pwdGraceAuthNLimit`                          | `3`                                                |
 
+When ppolicy and the data read-only account are enabled, bootstrap explicitly
+denies that account access to `pwdHistory` before its general read grant. Other
+identities continue through the usual ACLs: administrators and replication retain
+access, while ordinary users are denied by the final catch-all unless a custom
+ACL grants access. Replace `64-password-history-acl.ldif.template` through the
+custom config directory to override the read-only restriction. This ACL is added
+on new bootstraps only; existing databases need an explicit ACL update.
+
 **Unique**
 
 | Variable                         | Description                                   | Default                              |

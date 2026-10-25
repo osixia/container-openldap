@@ -32,6 +32,9 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Fixed
 
+- Hide `pwdHistory` from the data read-only account when ppolicy is enabled
+  on new bootstraps, preserving normal ACL evaluation, custom overrides and
+  history replication.
 - Create bootstrap, schema conversion and TLS watcher temporary files under
   `/run/container/tmp` instead of relying on a writable `/tmp`.
 - Render bootstrap LDIF templates in a temporary writable copy, allowing read-only

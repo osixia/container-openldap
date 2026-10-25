@@ -62,6 +62,9 @@ if [ "${OPENLDAP_BOOTSTRAP_PPOLICY}" = "true" ]; then
         OUTPUT_DIR="$3"
 
         prepare_ldif_files "${SOURCE_DIR}/ppolicy" "${OUTPUT_DIR}"
+        if [ "${OPENLDAP_BOOTSTRAP_DATA_READONLY}" = "true" ]; then
+            prepare_ldif_files "${SOURCE_DIR}/ppolicy-readonly" "${OUTPUT_DIR}"
+        fi
     fi
 
 fi

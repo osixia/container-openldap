@@ -19,7 +19,7 @@ Scripts are executed in numeric order. Most are feature-gated by an environment 
 | `35-auditlog.sh` | `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED=true` | Configures file-based auditing on the data database |
 | `40-refint.sh` | `OPENLDAP_BOOTSTRAP_REFINT=true` | Configures the referential integrity overlay and optional replacement DN |
 | `45-refint-nothing.sh` | `OPENLDAP_BOOTSTRAP_REFINT=true` and `OPENLDAP_BOOTSTRAP_REFINT_NOTHING_DN` non-empty | Creates the passwordless replacement role |
-| `50-ppolicy.sh` | `OPENLDAP_BOOTSTRAP_PPOLICY=true` | Configures the password policy and validates inactivity and progressive lockout prerequisites |
+| `50-ppolicy.sh` | `OPENLDAP_BOOTSTRAP_PPOLICY=true` | Configures password policy, hides history from the data read-only account while preserving normal ACL evaluation, and validates inactivity and progressive lockout prerequisites |
 | `60-unique.sh` | `OPENLDAP_BOOTSTRAP_UNIQUE=true` | Configures the unique attributes overlay |
 | `70-memberof.sh` | `OPENLDAP_BOOTSTRAP_MEMBEROF=true` | Configures the memberof overlay |
 | `80-replication.sh` | `OPENLDAP_BOOTSTRAP_REPLICATION=true` | Sets up multi-provider syncrepl replication (requires 2 to 9 hosts) |

@@ -18,6 +18,7 @@ ldif/
 │   ├── monitor-readonly/  # Read-only monitor user (OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true)
 │   ├── auditlog/          # Audit file (OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED=true)
 │   ├── ppolicy/           # Password policy overlay (OPENLDAP_BOOTSTRAP_PPOLICY=true)
+│   ├── ppolicy-readonly/  # Hide history from the data read-only account (PPOLICY and DATA_READONLY enabled)
 │   ├── refint/            # Referential integrity overlay (OPENLDAP_BOOTSTRAP_REFINT=true)
 │   ├── unique/            # Unique attributes overlay (OPENLDAP_BOOTSTRAP_UNIQUE=true)
 │   ├── memberof/          # Memberof overlay (OPENLDAP_BOOTSTRAP_MEMBEROF=true)
@@ -74,6 +75,15 @@ Core OpenLDAP configuration applied on every bootstrap. Files are numbered to co
 | `79-monitor-acl-close.ldif` | Closes monitor ACLs (deny all) |
 
 ACL files ending in `-close.ldif` append a final `access to * by * none` rule to deny any unmatched access, ensuring a safe default.
+
+## config/ppolicy-readonly
+
+`64-password-history-acl.ldif.template` denies `pwdHistory` access to the data
+read-only account before its general read grant. It is loaded only when ppolicy
+and the data read-only account are both enabled. Its final `by * break` lets other
+identities follow the usual database ACLs, including administrator and replication
+access and any custom grants before the final deny-all. Replace this fragment
+through the custom config directory to change the read-only restriction.
 
 ## data/ppolicy
 

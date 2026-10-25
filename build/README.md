@@ -33,6 +33,10 @@ After the shared version check, `tests/` runs integration scenarios on each buil
 - auditlog: automatic module loading, writes, custom paths, rotation and restarts;
 - last successful binds: disabled by default, precision throttling, failed binds
   and compatibility with ppolicy;
+- password history privacy: hidden from readonly, ordinary users, owner and
+  anonymous users by default; retained for administrators and replication, with
+  reuse checks on every node, custom ACL grants and fragment replacements, and
+  no extra ACL when ppolicy or the read-only account is disabled;
 - password policy inactivity: disabled by default, active and idle accounts,
   first logins and missing prerequisites;
 - progressive password policy lockouts: disabled by default, doubling and cap,

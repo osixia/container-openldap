@@ -26,6 +26,7 @@ var scenarios = []scenario{
 	{"automatic module loading", AutomaticModules},
 	{"audit logging", AuditLog},
 	{"last successful binds", LastBind},
+	{"password history privacy", PasswordPolicyHistory},
 	{"password policy inactivity", PasswordPolicyIdle},
 	{"progressive password policy lockouts", PasswordPolicyDelay},
 	{"password helpers", PasswordHelpers},
