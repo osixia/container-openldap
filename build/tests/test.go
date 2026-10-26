@@ -19,6 +19,7 @@ type scenario struct {
 
 var scenarios = []scenario{
 	{"default bootstrap", Default},
+	{"standard data tree and management account", DataManagement},
 	{"global request limits", GlobalLimits},
 	{"read-only bootstrap templates", ReadOnlyTemplates},
 	{"alternative schemas", AlternativeSchemas},

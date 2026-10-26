@@ -1,0 +1,14 @@
+dn: ${OPENLDAP_BOOTSTRAP_DATA_TREE_USERS_DN}
+objectClass: top
+objectClass: organizationalUnit
+ou: ${OPENLDAP_BOOTSTRAP_DATA_TREE_USERS_OU}
+
+dn: ${OPENLDAP_BOOTSTRAP_DATA_TREE_GROUPS_DN}
+objectClass: top
+objectClass: organizationalUnit
+ou: ${OPENLDAP_BOOTSTRAP_DATA_TREE_GROUPS_OU}
+
+dn: ${OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_DN}
+objectClass: top
+objectClass: organizationalUnit
+ou: ${OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_OU}

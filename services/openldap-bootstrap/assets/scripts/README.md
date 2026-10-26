@@ -12,9 +12,11 @@ Scripts are executed in numeric order. Most are feature-gated by an environment 
 | Script | Trigger | Description |
 |--------|---------|-------------|
 | `00-base.sh` | always | Core bootstrap: root passwords, modules, schemas and base LDIF files, including global request limits |
+| `05-data-tree.sh` | `OPENLDAP_BOOTSTRAP_DATA_TREE=true` | Creates the users, groups and services OUs |
 | `10-tls.sh` | `OPENLDAP_BOOTSTRAP_TLS=true` | Applies TLS certificate and protocol configuration |
 | `15-tls-required.sh` | `OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true` | Enforces minimum 128-bit SSF (warns if TLS is not also enabled) |
 | `20-database-readonly.sh` | `OPENLDAP_BOOTSTRAP_DATA_READONLY=true` | Creates a read-only service account for the data database |
+| `25-data-management.sh` | `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true` | Creates one account below the services branch, reading users/groups and resetting user passwords without hash/history access or other write permissions |
 | `30-monitor-readonly.sh` | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true` | Creates a read-only service account for the monitor database |
 | `35-auditlog.sh` | `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED=true` | Configures file-based auditing on the data database |
 | `40-refint.sh` | `OPENLDAP_BOOTSTRAP_REFINT=true` | Configures the referential integrity overlay and optional replacement DN |

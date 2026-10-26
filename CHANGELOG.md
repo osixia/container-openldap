@@ -6,6 +6,11 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Added
 
+- Add optional `OPENLDAP_BOOTSTRAP_DATA_TREE` to create users, groups and services
+  OUs, and `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT` for one scoped application account.
+  It reads users/groups and resets user passwords, including with ppolicy safe
+  modification, without hash/history reads or writes to profiles, memberships,
+  service accounts or configuration. Both features are disabled by default.
 - Add `openldap-ctl validate-ldif` for files and directories to check data entry LDIF
   syntax, values and schemas without importing entries or stopping slapd.
 - Expose bootstrap settings for pending request limits, incoming LDAP message sizes

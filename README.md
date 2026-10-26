@@ -381,6 +381,13 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_BOOTSTRAP_DATA_LAST_BIND_PRECISION` | Minimum interval between `pwdLastSuccess` updates, in seconds | `3600` |
 | `OPENLDAP_BOOTSTRAP_DATA_ROOT_DN`                     | Root DN for main database                                                         | `cn=admin,${OPENLDAP_BOOTSTRAP_SUFFIX}`                     |
 | `OPENLDAP_BOOTSTRAP_DATA_ROOT_PASSWORD_HASHED`        | Hashed password for main database root DN; generated if empty                     | ``                                                          |
+| `OPENLDAP_BOOTSTRAP_DATA_TREE` | Create the users, groups and services OUs | `false` |
+| `OPENLDAP_BOOTSTRAP_DATA_TREE_USERS_DN` | Users OU DN | `ou=users,${OPENLDAP_BOOTSTRAP_SUFFIX}` |
+| `OPENLDAP_BOOTSTRAP_DATA_TREE_GROUPS_DN` | Groups OU DN | `ou=groups,${OPENLDAP_BOOTSTRAP_SUFFIX}` |
+| `OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_DN` | Services OU DN | `ou=services,${OPENLDAP_BOOTSTRAP_SUFFIX}` |
+| `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT` | Enable user/group reads and user password resets | `false` |
+| `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_DN` | Management account DN | `cn=management,${OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_DN}` |
+| `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_PASSWORD_HASHED` | Hashed management password; generated if empty when enabled | `` |
 | `OPENLDAP_BOOTSTRAP_DATA_READONLY`                    | Enable read-only data account creation                                            | `false`                                                     |
 | `OPENLDAP_BOOTSTRAP_DATA_READONLY_DN`                 | DN of the read-only data account                                                  | `cn=readonly,${OPENLDAP_BOOTSTRAP_SUFFIX}`                  |
 | `OPENLDAP_BOOTSTRAP_DATA_READONLY_PASSWORD_HASHED`    | Hashed password of the read-only data account; generated if empty when enabled    | ``                                                          |

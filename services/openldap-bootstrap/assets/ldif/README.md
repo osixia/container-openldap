@@ -15,6 +15,7 @@ ldif/
 │   ├── tls/               # TLS settings (OPENLDAP_BOOTSTRAP_TLS=true)
 │   ├── tls-required/      # Enforce TLS (OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true)
 │   ├── database-readonly/ # Read-only data DB user (OPENLDAP_BOOTSTRAP_DATA_READONLY=true)
+│   ├── data-management/   # Scoped application account ACLs (OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true)
 │   ├── monitor-readonly/  # Read-only monitor user (OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true)
 │   ├── auditlog/          # Audit file (OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED=true)
 │   ├── ppolicy/           # Password policy overlay (OPENLDAP_BOOTSTRAP_PPOLICY=true)
@@ -26,6 +27,8 @@ ldif/
 │   └── custom/            # User-provided config LDIF files
 └── data/            # LDAP directory data (populated on first bootstrap)
     ├── base/              # Root organization entry (always applied)
+    ├── data-tree/         # Users, groups and services OUs (OPENLDAP_BOOTSTRAP_DATA_TREE=true)
+    ├── data-management/   # Application account (OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true)
     ├── database-readonly/ # Read-only account entry (OPENLDAP_BOOTSTRAP_DATA_READONLY=true)
     ├── monitor-readonly/  # Read-only monitor account (OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true)
     ├── ppolicy/           # Password policy group and default policy (OPENLDAP_BOOTSTRAP_PPOLICY=true)
@@ -75,6 +78,28 @@ Core OpenLDAP configuration applied on every bootstrap. Files are numbered to co
 | `79-monitor-acl-close.ldif` | Closes monitor ACLs (deny all) |
 
 ACL files ending in `-close.ldif` append a final `access to * by * none` rule to deny any unmatched access, ensuring a safe default.
+
+## data/data-tree and data/data-management
+
+`OPENLDAP_BOOTSTRAP_DATA_TREE=true` creates `ou=users`, `ou=groups` and `ou=services`
+below the suffix. `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true` creates one account,
+by default `cn=management,ou=services,<suffix>`, to read users/groups and reset user
+passwords. It cannot edit profiles or groups or read password hashes/history.
+Both options are independent and disabled by default.
+
+The OU DNs, account DN and password hash are configurable through the matching
+`OPENLDAP_BOOTSTRAP_DATA_TREE_*_DN` and `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_*` variables.
+If custom LDIFs supply the OUs, leave tree creation disabled and load them before
+`80-data-management-account.ldif`. Do not duplicate automatically created OUs.
+
+## config/data-management
+
+`63-data-management-acl.ldif.template` limits password writes to the users branch.
+Its `=wm` privileges allow administrative resets without the old password, without
+hash read/compare. With ppolicy, these resets bypass quality, history-reuse and
+minimum-age checks: enforce password requirements in the application.
+Service accounts and configuration remain protected; other identities keep their
+usual ACLs.
 
 ## config/ppolicy-readonly
 
