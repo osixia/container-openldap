@@ -41,7 +41,7 @@ Run a basic OpenLDAP server:
 docker run --name openldap --hostname ldap.example.org -p 389:3890 -p 636:6360 \
   -e OPENLDAP_BOOTSTRAP_ORGANIZATION="Keycloakers Org" \
   -e OPENLDAP_BOOTSTRAP_SUFFIX="dc=keycloakers,dc=org" \
-  osixia/openldap:2.6.15-beta
+  osixia/openldap:2.6.15-rc
 ```
 
 For persistent deployments, mount config, data, and backup directories:
@@ -53,7 +53,7 @@ docker run --name openldap --hostname ldap.example.org -p 389:3890 -p 636:6360 \
   -v openldap-conf:/etc/openldap/slapd.d \
   -v openldap-data:/var/lib/openldap/openldap-data \
   -v openldap-backups:/var/lib/openldap/openldap-backups \
-  osixia/openldap:2.6.15-beta
+  osixia/openldap:2.6.15-rc
 ```
 
 Notes:
@@ -70,12 +70,12 @@ Retrieve the generated admin password from the container logs:
 docker logs openldap 2>&1 | grep -i password
 ```
 
-Then search the base DN to confirm the server is responding:
+Then search the base DN to confirm the server is responding, replacing `<database root password>` with the password from the logs:
 
 ``` bash
 docker exec openldap container run -- \
   ldapsearch -H ldap://localhost:3890 \
-  -D "cn=admin,dc=keycloakers,dc=org" -w <database root password> \
+  -D "cn=admin,dc=keycloakers,dc=org" -w '<database root password>' \
   -b "dc=keycloakers,dc=org" "(objectClass=*)"
 ```
 
@@ -88,7 +88,7 @@ The `osixia/openldap` container allows you to pass additional command-line argum
 Arguments specified after `--` are forwarded to the slapd process inside the container:
 
 ``` bash
-docker run osixia/openldap:2.6.15-beta -- -d -1
+docker run osixia/openldap:2.6.15-rc -- -d -1
 ```
 
 **Customizing bootstrap configuration and data**
@@ -104,21 +104,21 @@ The `--log-level debug --bash` options from `osixia/baseimage` enables debug log
 If OpenLDAP keeps crashing, you can add `--skip-process` to start the container without launching service processes.
 
 ``` bash
-docker run -it osixia/openldap:2.6.15-beta --log-level debug --bash
-docker run -it osixia/openldap:2.6.15-beta --skip-process --log-level debug --bash
+docker run -it osixia/openldap:2.6.15-rc --log-level debug --bash
+docker run -it osixia/openldap:2.6.15-rc --skip-process --log-level debug --bash
 ```
 
 You can also increase the OpenLDAP daemon (`slapd`) log level with `OPENLDAP_DEBUG_LEVEL`:
 ``` bash
-docker run -e OPENLDAP_DEBUG_LEVEL=-1 osixia/openldap:2.6.15-beta
+docker run -e OPENLDAP_DEBUG_LEVEL=-1 osixia/openldap:2.6.15-rc
 ```
 
 > `OPENLDAP_DEBUG_LEVEL` only affects OpenLDAP (`slapd`) logging. To increase container/runtime logs, use the baseimage flag `--log-level` (for example `--log-level debug`).
 
 To see all available command-line options:
 ``` bash
-docker run --rm osixia/openldap:2.6.15-beta --help # osixia/baseimage options
-docker run --rm osixia/openldap:2.6.15-beta -x openldap -- --help # slapd command-line options
+docker run --rm osixia/openldap:2.6.15-rc --help # osixia/baseimage options
+docker run --rm osixia/openldap:2.6.15-rc -x openldap -- --help # slapd command-line options
 ```
 
 ## 🛟 Backup / Restore
@@ -160,7 +160,7 @@ docker run --name openldap-cron \
   -v openldap-conf:/etc/openldap/slapd.d \
   -v openldap-data:/var/lib/openldap/openldap-data \
   -v openldap-backups:/var/lib/openldap/openldap-backups \
-  osixia/openldap:2.6.15-beta -x openldap-cron
+  osixia/openldap:2.6.15-rc -x openldap-cron
 ```
 
 See the `OPENLDAP_CRON_JOB` environment variable to adjust the cron schedule and behavior.
@@ -181,7 +181,7 @@ The simplest way is to mount a directory that contains files with exactly those 
 docker run --name openldap --hostname ldap.example.org -p 389:3890 -p 636:6360 \
   -e OPENLDAP_BOOTSTRAP_TLS=true \
   -v $PWD/certs:/container/services/openldap/assets/certs \
-  osixia/openldap:2.6.15-beta
+  osixia/openldap:2.6.15-rc
 ```
 
 If you also set `OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true`, bootstrap adds TLS-required access rules. That setting is stricter than plain TLS enablement and is intended for deployments where non-TLS client access should be rejected.
@@ -212,7 +212,7 @@ docker run --name ldap1 --network openldap-net --hostname ldap1.example.org \
   -e OPENLDAP_BOOTSTRAP_REPLICATION=true \
   -e OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS="ldap://ldap1.example.org:3890 ldap://ldap2.example.org:3890" \
   -e OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD="passw0rd" \
-  osixia/openldap:2.6.15-beta
+  osixia/openldap:2.6.15-rc
 ```
 
 Minimal example for `ldap2.example.org`:
@@ -225,7 +225,7 @@ docker run --name ldap2 --network openldap-net --hostname ldap2.example.org \
   -e OPENLDAP_BOOTSTRAP_REPLICATION=true \
   -e OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS="ldap://ldap1.example.org:3890 ldap://ldap2.example.org:3890" \
   -e OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD="passw0rd" \
-  osixia/openldap:2.6.15-beta
+  osixia/openldap:2.6.15-rc
 ```
 
 If TLS is required for replication, set `OPENLDAP_BOOTSTRAP_REPLICATION_TLS=true` or rely on its default value from `OPENLDAP_BOOTSTRAP_TLS_REQUIRED`.
@@ -238,7 +238,7 @@ This image ships with the full suite of OpenLDAP utilities — both server-side 
 
 **Database tools**
 
-`slapcat`, `slapadd`, `slapindex`, and `slaptest` operate directly on the local database files and must run inside the container.
+`slapcat`, `slapadd`, `slapindex`, and `slaptest` operate directly on local configuration and database files. They can also run in a temporary container with the corresponding volumes mounted.
 
 Export the data database to LDIF:
 
@@ -261,7 +261,7 @@ docker exec openldap container run -- slapcat -n 0
 Search for all entries under a base DN:
 
 ``` bash
-docker run --rm osixia/openldap:2.6.15-beta run -- \
+docker run --rm osixia/openldap:2.6.15-rc run -- \
   ldapsearch -H ldap://172.16.0.1 \
   -D "cn=admin,dc=example,dc=org" -w passw0rd \
   -b "dc=example,dc=org" "(objectClass=*)"
@@ -270,7 +270,7 @@ docker run --rm osixia/openldap:2.6.15-beta run -- \
 Verify bind credentials:
 
 ``` bash
-docker run --rm osixia/openldap:2.6.15-beta run -- \
+docker run --rm osixia/openldap:2.6.15-rc run -- \
   ldapwhoami -H ldap://172.16.0.1 \
   -D "cn=admin,dc=example,dc=org" -w passw0rd
 ```
@@ -279,7 +279,7 @@ Add entries from a local LDIF file:
 
 ``` bash
 docker run --rm -v /path/to/entries.ldif:/tmp/entries.ldif \
-  osixia/openldap:2.6.15-beta run -- \
+  osixia/openldap:2.6.15-rc run -- \
   ldapadd -H ldap://172.16.0.1 \
   -D "cn=admin,dc=example,dc=org" -w passw0rd \
   -f /tmp/entries.ldif
@@ -288,7 +288,7 @@ docker run --rm -v /path/to/entries.ldif:/tmp/entries.ldif \
 Change a user's password:
 
 ``` bash
-docker run --rm osixia/openldap:2.6.15-beta run -- \
+docker run --rm osixia/openldap:2.6.15-rc run -- \
   ldappasswd -H ldap://172.16.0.1 \
   -D "cn=admin,dc=example,dc=org" -w passw0rd \
   -s newpassword "uid=jdoe,ou=people,dc=example,dc=org"
@@ -296,14 +296,13 @@ docker run --rm osixia/openldap:2.6.15-beta run -- \
 
 ### Validate LDIF
 
-Check data entries against the initialized local configuration without importing them or stopping slapd:
+Check data entries against the instance's initialized configuration without importing them or stopping slapd:
 
 ```bash
 docker exec openldap container run -- openldap-ctl validate-ldif /data/users.ldif
-docker exec openldap container run -- openldap-ctl validate-ldif /data/users.ldif /data/groups.ldif
-docker exec openldap container run -- openldap-ctl validate-ldif /data/ldif/
 ```
 
+Pass multiple file paths or a directory; all paths must be accessible inside the container.
 Directories are searched recursively for `*.ldif`, sorted by version and excluding hidden paths.
 Each file must contain complete entries. All files are checked; any validation failure returns a non-zero status.
 Checks LDIF syntax, attribute values and schemas. Does not check existing entries,
@@ -314,20 +313,22 @@ ACLs or overlay rules, and does not accept `ldapmodify` change records.
 Generate a random password:
 
 ``` bash
-docker run --rm osixia/openldap:2.6.15-beta run -- openldap-ctl password generate
+docker run --rm osixia/openldap:2.6.15-rc run -- openldap-ctl password generate
 ```
 
 Hash a password:
 
 ``` bash
-docker run --rm osixia/openldap:2.6.15-beta run -- openldap-ctl password hash passw0rd
+docker run --rm osixia/openldap:2.6.15-rc run -- openldap-ctl password hash passw0rd
 ```
 
 Read a password from a mounted secret or standard input:
 
 ```bash
-docker exec openldap container run -- openldap-ctl password hash --file /run/secrets/password
-docker exec -i openldap container run -- openldap-ctl password hash --stdin < password.txt
+docker run --rm --user "$UID" -v "$PWD/password.txt:/run/secrets/password:ro" \
+  osixia/openldap:2.6.15-rc run -- openldap-ctl password hash --file /run/secrets/password
+docker run --rm -i osixia/openldap:2.6.15-rc run -- \
+  openldap-ctl password hash --stdin < password.txt
 ```
 
 Contents are hashed exactly, including trailing newlines. Use `hash -- password`
@@ -337,7 +338,7 @@ for a literal password named `--file`, `--stdin` or `--`.
 
 ``` bash
 docker run --rm --user $UID -v $(pwd)/schema:/data   \
-  osixia/openldap:2.6.15-beta run -- openldap-ctl schema2ldif /data/test.schema
+  osixia/openldap:2.6.15-rc run -- openldap-ctl schema2ldif /data/test.schema
 ```
 
 ## 🔤 Environment Variables

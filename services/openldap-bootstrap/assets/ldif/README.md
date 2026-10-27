@@ -227,7 +227,7 @@ mkdir -p custom-config custom-data
 docker run --name openldap \
   -v "$(pwd)/custom-config:/container/services/openldap-bootstrap/assets/ldif/config/custom" \
   -v "$(pwd)/custom-data:/container/services/openldap-bootstrap/assets/ldif/data/custom" \
-  osixia/openldap:2.6.15-beta
+  osixia/openldap:2.6.15-rc
 ```
 
 Put `.ldif` files in these directories, or use `.ldif.template` files with `${VARIABLE}` placeholders to substitute environment variables. The mounts may be read-only: bootstrap renders templates in a temporary writable copy.

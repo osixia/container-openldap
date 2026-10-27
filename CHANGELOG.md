@@ -73,6 +73,15 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 - Render bootstrap LDIF templates in a temporary writable copy, allowing read-only
   sources and Kubernetes projected-volume symlinks without modifying source files.
 
+### Documentation
+
+- Pin image examples to `osixia/openldap:2.6.15-rc` and quote the Quickstart
+  password placeholder so the shell does not interpret it as redirections.
+- Align documentation with the renamed monitor and auditlog bootstrap flags.
+- Simplify LDIF validation documentation to one `docker exec` example, with support
+  for multiple files or a directory described in text.
+- Use temporary containers for password hashing from local files or standard input.
+
 ## 2.6.15-beta
 
 ### Changed
