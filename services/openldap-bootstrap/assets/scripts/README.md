@@ -15,13 +15,14 @@ Scripts are executed in numeric order. Most are feature-gated by an environment 
 | `05-data-tree.sh` | `OPENLDAP_BOOTSTRAP_DATA_TREE=true` | Creates the users, groups and services OUs |
 | `10-tls.sh` | `OPENLDAP_BOOTSTRAP_TLS=true` | Applies TLS certificate and protocol configuration |
 | `15-tls-required.sh` | `OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true` | Enforces minimum 128-bit SSF (warns if TLS is not also enabled) |
-| `20-database-readonly.sh` | `OPENLDAP_BOOTSTRAP_DATA_READONLY=true` | Creates a read-only service account for the data database |
+| `20-database-readonly.sh` | `OPENLDAP_BOOTSTRAP_DATA_READONLY=true` | Creates a read-only service account for the data database and hides password history when ppolicy is enabled |
+| `23-database-admin.sh` | `OPENLDAP_BOOTSTRAP_DATA_ADMIN=true` | Creates a scoped users/groups administrator, protecting services, password hashes/history and configuration |
 | `25-database-management.sh` | `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true` | Creates one account below the services branch, reading users/groups and resetting user passwords with configurable hidden attributes and no other write permissions |
 | `30-monitor-readonly.sh` | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true` | Creates a read-only service account for the monitor database |
 | `35-auditlog.sh` | `OPENLDAP_BOOTSTRAP_AUDITLOG=true` | Configures file-based auditing on the data database |
 | `40-refint.sh` | `OPENLDAP_BOOTSTRAP_REFINT=true` | Configures the referential integrity overlay and optional replacement DN |
 | `45-refint-nothing.sh` | `OPENLDAP_BOOTSTRAP_REFINT=true` and `OPENLDAP_BOOTSTRAP_REFINT_NOTHING_DN` non-empty | Creates the passwordless replacement role |
-| `50-ppolicy.sh` | `OPENLDAP_BOOTSTRAP_PPOLICY=true` | Configures password policy, hides history from the data read-only account while preserving normal ACL evaluation, and validates inactivity and progressive lockout prerequisites |
+| `50-ppolicy.sh` | `OPENLDAP_BOOTSTRAP_PPOLICY=true` | Configures password policy and validates inactivity and progressive lockout prerequisites |
 | `60-unique.sh` | `OPENLDAP_BOOTSTRAP_UNIQUE=true` | Configures the unique attributes overlay |
 | `70-memberof.sh` | `OPENLDAP_BOOTSTRAP_MEMBEROF=true` | Configures the memberof overlay |
 | `80-replication.sh` | `OPENLDAP_BOOTSTRAP_REPLICATION=true` | Sets up multi-provider syncrepl replication (requires 2 to 9 hosts) |
@@ -37,7 +38,7 @@ Utility functions shared across the bootstrap scripts.
 |----------|-------------|
 | `check_args` | Validates that a script was called with the expected operation (`env`/`ldif`) and argument count |
 | `prepare_env_file` | Appends exported variable assignments (safely shell-quoted) to an env file |
-| `prepare_ldif_files` | Copies sources to a temporary writable directory (dereferencing symlinks), renders `.ldif.template` files via `container envsubst templates`, then copies all resulting `.ldif` files (sorted) to the output directory. Sources can be mounted read-only. The function removes its working copy on success; the bootstrap's global EXIT trap cleans up on failure. |
+| `prepare_ldif_files` | Copies sources to a temporary writable directory (dereferencing symlinks), renders templates via `container envsubst templates`, then copies the resulting `.ldif` and `.ldif.optional` files (sorted) to the output directory. Feature scripts activate optional fragments with `mv`; the helper does not select them. Sources can be mounted read-only. The function removes its working copy on success; the bootstrap's global EXIT trap cleans up on failure. |
 | `get_dn_attr` | Extracts the value of a named attribute from a DN string (e.g. `cn` from `cn=admin,dc=example,dc=com`) |
 
 ### `helpers/password.sh`
@@ -52,5 +53,5 @@ Utility functions shared across the bootstrap scripts.
 
 1. Create a numbered script (e.g. `55-myfeature.sh`) that accepts `env` and `ldif` arguments.
 2. Guard execution with the appropriate environment variable check.
-3. Add the corresponding LDIF templates under `../ldif/config/` and/or `../ldif/data/`.
+3. Add LDIF templates under matching feature directories in `../ldif/config/` and/or `../ldif/data/`: `55-myfeature.sh` loads `myfeature/`, with filenames such as `NN-myfeature-description.ldif.template`. Name conditional templates `.ldif.optional.template` and activate their rendered `.ldif.optional` files with `mv` in the feature script when needed. Unactivated fragments are ignored during final assembly.
 4. Source `helpers/common.sh` and `helpers/password.sh` as needed.

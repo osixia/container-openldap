@@ -6,6 +6,11 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Added
 
+- Add optional `OPENLDAP_BOOTSTRAP_DATA_ADMIN` for a real directory administrator
+  entry that can manage users/groups and reset their passwords, while protecting
+  service accounts, its own account, password hashes/history and `cn=config`.
+  Document how this scoped administrator differs from the data/config root DNs
+  and the application management account.
 - Expose management account hidden attributes through
   `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES` and
   `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_PPOLICY_ATTRIBUTES`.
@@ -39,6 +44,11 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
   deletion of its last real member.
 
 ### Changed
+
+- Keep password-history ACL fragments in their account feature directories as
+  `.ldif.optional.template` files, activated with `mv` by the account scripts.
+  The helper only renders/copies fragments; final assembly ignores inactive files.
+  Read-only history overrides must use `64-database-readonly-ppolicy-acl.ldif`.
 
 - Rename bootstrap feature flags `OPENLDAP_BOOTSTRAP_MONITOR_ENABLED` and
   `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED` to `OPENLDAP_BOOTSTRAP_MONITOR` and

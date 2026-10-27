@@ -47,7 +47,7 @@ func PasswordPolicyHistory(ctx context.Context, client *dagger.Client, image *da
   by * break
 `)
 			} else if mode == "replacement" {
-				nodeImage = image.WithNewFile("/container/services/openldap-bootstrap/assets/ldif/config/custom/64-password-history-acl.ldif", "")
+				nodeImage = image.WithNewFile("/container/services/openldap-bootstrap/assets/ldif/config/custom/64-database-readonly-ppolicy-acl.ldif", "")
 			}
 			if mode == "replicated" {
 				nodes = append(nodes, "history-ldap2")
@@ -64,7 +64,7 @@ func PasswordPolicyHistory(ctx context.Context, client *dagger.Client, image *da
 			services := make([]*dagger.Service, 0, len(nodes))
 			defer func() { stopNodes(ctx, services) }()
 			for _, node := range nodes {
-				urls := env{"OPENLDAP_URLS": "ldap://" + node + ":3890 ldapi:///"}
+				urls := env{"OPENLDAP_URLS": "ldap://" + node + ":3890 ldaps://" + node + ":6360 ldapi:///"}
 				service, err := startNode(ctx, nodeImage, node, merge(settings, urls), nil, nil)
 				if err != nil {
 					return err

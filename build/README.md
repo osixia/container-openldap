@@ -21,6 +21,10 @@ own native runner, then publishes them together from their OCI archives
 After the shared version check, `tests/` runs integration scenarios on each built image:
 
 - default bootstrap;
+- scoped directory administrator: disabled by default, custom DNs and supplied
+  OUs, generated passwords, readable account identifiers for directory clients,
+  user/group creation, edits, renames, deletion and password resets, hidden
+  hashes/history, and protected service accounts, own account and configuration;
 - standard users/groups/services tree and management account: independent opt-ins,
   custom DNs and supplied OUs, generated passwords, user/group
   reads, password resets including application administrators, ppolicy-safe resets,

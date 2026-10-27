@@ -6,6 +6,11 @@ Files with a `.template` extension use `${VARIABLE}` placeholders that are subst
 
 Rendered LDIF files are assembled in version-sort order (`sort -V`); numerical prefixes control ordering.
 
+Conditional templates use `.ldif.optional.template`. They render to `.ldif.optional`
+in the temporary output directory. The owning feature script activates them with
+`mv` to `.ldif` when needed; final assembly ignores files still ending in `.optional`.
+Sources stay unchanged, including on read-only volumes.
+
 ## Structure
 
 ```
@@ -15,11 +20,11 @@ ldif/
 │   ├── tls/                   # TLS settings (OPENLDAP_BOOTSTRAP_TLS=true)
 │   ├── tls-required/          # Enforce TLS (OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true)
 │   ├── database-readonly/     # Read-only data DB user (OPENLDAP_BOOTSTRAP_DATA_READONLY=true)
+│   ├── database-admin/        # Scoped users/groups administrator (OPENLDAP_BOOTSTRAP_DATA_ADMIN=true)
 │   ├── database-management/   # Scoped application account ACLs (OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true)
 │   ├── monitor-readonly/      # Read-only monitor user (OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true)
 │   ├── auditlog/              # Audit file (OPENLDAP_BOOTSTRAP_AUDITLOG=true)
 │   ├── ppolicy/               # Password policy overlay (OPENLDAP_BOOTSTRAP_PPOLICY=true)
-│   ├── ppolicy-readonly/      # Hide history from the data read-only account (PPOLICY and DATA_READONLY enabled)
 │   ├── refint/                # Referential integrity overlay (OPENLDAP_BOOTSTRAP_REFINT=true)
 │   ├── unique/                # Unique attributes overlay (OPENLDAP_BOOTSTRAP_UNIQUE=true)
 │   ├── memberof/              # Memberof overlay (OPENLDAP_BOOTSTRAP_MEMBEROF=true)
@@ -28,6 +33,7 @@ ldif/
 └── data/            # LDAP directory data (populated on first bootstrap)
     ├── base/                  # Root organization entry (always applied)
     ├── data-tree/             # Users, groups and services OUs (OPENLDAP_BOOTSTRAP_DATA_TREE=true)
+    ├── database-admin/        # Directory administrator (OPENLDAP_BOOTSTRAP_DATA_ADMIN=true)
     ├── database-management/   # Application account (OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true)
     ├── database-readonly/     # Read-only account entry (OPENLDAP_BOOTSTRAP_DATA_READONLY=true)
     ├── monitor-readonly/      # Read-only monitor account (OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true)
@@ -79,6 +85,66 @@ Core OpenLDAP configuration applied on every bootstrap. Files are numbered to co
 
 ACL files ending in `-close.ldif` append a final `access to * by * none` rule to deny any unmatched access, ensuring a safe default.
 
+## Root, admin and management accounts
+
+A DN identifies an LDAP account or entry. These accounts serve different purposes:
+
+| Account | Default DN | Purpose and permissions |
+|---|---|---|
+| Data root | `cn=admin,<suffix>` | Maintenance superuser for the data database; bypasses that database's ACLs and administrative limits |
+| Config root | `cn=admin,cn=config` | Server configuration superuser; can change schemas, ACLs, root passwords and other settings in `cn=config` |
+| Directory admin | `cn=admin,ou=services,<suffix>` | Day-to-day user/group administration, for example through phpLDAPadmin; obeys the scoped ACLs |
+| Management | `cn=management,ou=services,<suffix>` | Application account, for example Authelia; reads users/groups and resets user passwords |
+
+The two root DNs are configured through `OPENLDAP_BOOTSTRAP_DATA_ROOT_*` and
+`OPENLDAP_BOOTSTRAP_CONFIG_ROOT_*`. Each bypasses ACLs only in its own database:
+the data root is not automatically the configuration root. Config root can change
+the data database's ACLs and root password, so reserve it for server maintenance.
+Here, "root" means an LDAP superuser, not the Linux user running the container.
+
+Root DNs can authenticate without a directory entry. The optional directory admin
+has a real entry so clients such as phpLDAPadmin 2 can retrieve it after login.
+Its DN and password are separate from the root credentials. Use it for routine
+administration and keep root credentials for maintenance/recovery.
+
+## data/database-admin and config/database-admin
+
+Enable the standard branches and scoped administrator on a new installation:
+
+```bash
+OPENLDAP_BOOTSTRAP_DATA_TREE=true
+OPENLDAP_BOOTSTRAP_DATA_ADMIN=true
+OPENLDAP_BOOTSTRAP_DATA_ADMIN_PASSWORD_HASHED="{ARGON2}..."
+```
+
+An empty hash generates a password and prints it in the bootstrap logs, as for
+the other accounts. `OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN` defaults to
+`cn=admin,${OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_DN}`; use a DN starting with `cn=`.
+Keep administrator and application accounts outside the writable users/groups
+branches, normally in the separate services branch.
+The parent OUs must exist: enable tree creation or supply custom LDIFs before
+`70-database-admin-account.ldif`. Enabling this option does not modify an existing
+database.
+
+`62-database-admin-acl.ldif.template` lets the administrator create, read, edit,
+rename and delete entries in the configured users/groups branches, and reset user
+passwords. It denies password hash read/compare and access to `shadowLastChange`;
+with ppolicy, `61-database-admin-ppolicy-acl.ldif.optional.template` also denies access to
+`pwdHistory`. The administrator can read its own non-secret attributes, including
+its identifier, but cannot modify, rename, delete or reset its own account.
+Other service accounts, entries outside users/groups and `cn=config` stay protected.
+Use data root to rotate the directory administrator's password.
+
+Password resets use the same `=wm` privileges as management resets. With ppolicy,
+these administrative resets bypass quality, history-reuse and minimum-age checks;
+the application performing them must enforce the required password rules.
+This remains a powerful identity-management account: it can reset users' passwords
+and change group memberships, but it cannot grant itself configuration access.
+
+For phpLDAPadmin 2, configure DN login (`LDAP_LOGIN_ATTR=dn`) and accept this
+entry's object class (`LDAP_LOGIN_OBJECTCLASS=organizationalRole`). Configure its
+LDAP connection/search credentials and TLS separately.
+
 ## data/data-tree and data/database-management
 
 `OPENLDAP_BOOTSTRAP_DATA_TREE=true` creates `ou=users`, `ou=groups` and `ou=services`
@@ -106,14 +172,16 @@ minimum-age checks: enforce password requirements in the application.
 Service accounts and configuration remain protected; other identities keep their
 usual ACLs.
 
-## config/ppolicy-readonly
+## config/database-readonly
 
-`64-password-history-acl.ldif.template` denies `pwdHistory` access to the data
+`64-database-readonly-ppolicy-acl.ldif.optional.template` denies `pwdHistory` access to the data
 read-only account before its general read grant. It is loaded only when ppolicy
-and the data read-only account are both enabled. Its final `by * break` lets other
+and the data read-only account are both enabled, by `20-database-readonly.sh`.
+Its final `by * break` lets other
 identities follow the usual database ACLs, including administrator and replication
-access and any custom grants before the final deny-all. Replace this fragment
-through the custom config directory to change the read-only restriction.
+access and any custom grants before the final deny-all. Provide
+`64-database-readonly-ppolicy-acl.ldif` or its `.ldif.template` variant through
+the custom config directory to override the read-only restriction.
 
 ## data/ppolicy
 

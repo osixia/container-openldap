@@ -56,7 +56,7 @@ prepare_ldif_files() {
 
     while IFS= read -r file; do
         cp -frav "${file}" "${output_dir}" 2>&1 | container log debug
-    done < <(find "${work_dir}" -type f -name "*.ldif" | sort -V)
+    done < <(find "${work_dir}" -type f \( -name "*.ldif" -o -name "*.ldif.optional" \) | sort -V)
 
     rm -rf "${work_dir:?}"
 }

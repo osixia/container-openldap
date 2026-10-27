@@ -1,0 +1,41 @@
+#!/bin/bash
+# shellcheck disable=SC2034
+# shellcheck disable=SC1091
+# shellcheck disable=SC2153
+
+set -euo pipefail
+
+# if container log level is trace:
+# print commands and their arguments as they are executed
+container log level eq trace && set -x
+
+if [ "${OPENLDAP_BOOTSTRAP_DATA_ADMIN}" = "true" ]; then
+
+    source "/container/services/openldap-bootstrap/assets/scripts/helpers/common.sh"
+
+    check_args "$@"
+
+    TYPE="$1"
+
+    if [ "${TYPE}" = "env" ]; then
+        ENV_FILE="$2"
+
+        source "/container/services/openldap-bootstrap/assets/scripts/helpers/password.sh"
+
+        OPENLDAP_BOOTSTRAP_DATA_ADMIN_CN=$(get_dn_attr cn "${OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN}")
+
+        ensure_hashed_password OPENLDAP_BOOTSTRAP_DATA_ADMIN_PASSWORD_HASHED "database admin user"
+
+        prepare_env_file "${ENV_FILE}" OPENLDAP_BOOTSTRAP_DATA_ADMIN_CN OPENLDAP_BOOTSTRAP_DATA_ADMIN_PASSWORD_HASHED
+
+    elif [ "${TYPE}" = "ldif" ]; then
+        SOURCE_DIR="$2"
+        OUTPUT_DIR="$3"
+
+        prepare_ldif_files "${SOURCE_DIR}/database-admin" "${OUTPUT_DIR}"
+        if [ "${OPENLDAP_BOOTSTRAP_PPOLICY}" = "true" ] && [ -f "${OUTPUT_DIR}/61-database-admin-ppolicy-acl.ldif.optional" ]; then
+            mv "${OUTPUT_DIR}/61-database-admin-ppolicy-acl.ldif.optional" "${OUTPUT_DIR}/61-database-admin-ppolicy-acl.ldif"
+        fi
+    fi
+
+fi

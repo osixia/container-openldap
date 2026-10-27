@@ -385,6 +385,9 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_BOOTSTRAP_DATA_TREE_USERS_DN` | Users OU DN | `ou=users,${OPENLDAP_BOOTSTRAP_SUFFIX}` |
 | `OPENLDAP_BOOTSTRAP_DATA_TREE_GROUPS_DN` | Groups OU DN | `ou=groups,${OPENLDAP_BOOTSTRAP_SUFFIX}` |
 | `OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_DN` | Services OU DN | `ou=services,${OPENLDAP_BOOTSTRAP_SUFFIX}` |
+| `OPENLDAP_BOOTSTRAP_DATA_ADMIN` | Create an account to administer users and groups | `false` |
+| `OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN` | Scoped administrator DN | `cn=admin,${OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_DN}` |
+| `OPENLDAP_BOOTSTRAP_DATA_ADMIN_PASSWORD_HASHED` | Hashed administrator password; generated if empty when enabled | `` |
 | `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT` | Enable user/group reads and user password resets | `false` |
 | `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_DN` | Management account DN | `cn=management,${OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_DN}` |
 | `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_PASSWORD_HASHED` | Hashed management password; generated if empty when enabled | `` |
@@ -455,8 +458,8 @@ When ppolicy and the data read-only account are enabled, bootstrap explicitly
 denies that account access to `pwdHistory` before its general read grant. Other
 identities continue through the usual ACLs: administrators and replication retain
 access, while ordinary users are denied by the final catch-all unless a custom
-ACL grants access. Replace `64-password-history-acl.ldif.template` through the
-custom config directory to override the read-only restriction. This ACL is added
+ACL grants access. Override `64-database-readonly-ppolicy-acl.ldif` through the
+custom config directory to change the read-only restriction. This ACL is added
 on new bootstraps only; existing databases need an explicit ACL update.
 
 **Unique**
