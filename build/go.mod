@@ -1,6 +1,6 @@
 module github.com/osixia/container-openldap/build
 
-go 1.26.9
+go 1.26.10
 
 require (
 	dagger.io/dagger v0.21.10

@@ -41,12 +41,13 @@ func PasswordPolicyHistory(ctx context.Context, client *dagger.Client, image *da
 			nodes := []string{"history-ldap1"}
 			settings := merge(base, env{"OPENLDAP_BOOTSTRAP_PPOLICY": "true"})
 			nodeImage := image
-			if mode == "custom" {
+			switch mode {
+			case "custom":
 				nodeImage = image.WithNewFile("/container/services/openldap-bootstrap/assets/ldif/config/custom/68-history-reader-acl.ldif.template", `olcAccess: to attrs=pwdHistory
   by dn.exact="uid=history-observer,${OPENLDAP_BOOTSTRAP_SUFFIX}" read
   by * break
 `)
-			} else if mode == "replacement" {
+			case "replacement":
 				nodeImage = image.WithNewFile("/container/services/openldap-bootstrap/assets/ldif/config/custom/64-database-readonly-ppolicy-acl.ldif", "")
 			}
 			if mode == "replicated" {

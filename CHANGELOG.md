@@ -60,6 +60,9 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Fixed
 
+- Restore passing build checks by using Go 1.26.10 (fixing GO-2026-6809 in the
+  build toolchain) and satisfying the password-history test's staticcheck rule.
+
 - Hide `pwdHistory` from the data read-only account when ppolicy is enabled
   on new bootstraps, preserving normal ACL evaluation, custom overrides and
   history replication.
