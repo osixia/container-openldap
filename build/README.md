@@ -27,7 +27,8 @@ After the shared version check, `tests/` runs integration scenarios on each buil
   hashes/history, and protected service accounts, own account and configuration;
 - standard users/groups/services tree and management account: independent opt-ins,
   custom DNs and supplied OUs, generated passwords, user/group
-  reads, password resets including application administrators, ppolicy-safe resets,
+  reads, password resets including application administrators, old-password-verified
+  management changes, ppolicy-safe resets,
   configurable hidden attributes with/without ppolicy, rejection of empty combined
   lists, hidden hashes/history by default, and denied profile, membership, entry
   and service changes;

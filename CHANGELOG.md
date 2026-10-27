@@ -60,6 +60,8 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Fixed
 
+- Allow management password changes carrying the old password, as used by
+  Authelia, while keeping password hashes/history and LDAP Compare protected.
 - Restore passing build checks by using Go 1.26.10 (fixing GO-2026-6809 in the
   build toolchain) and satisfying the password-history test's staticcheck rule.
 

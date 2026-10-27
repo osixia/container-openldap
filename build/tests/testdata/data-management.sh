@@ -103,6 +103,13 @@ for dn in "${USER_DN}" "${APP_ADMIN_DN}"; do
 done
 ok 'management resets ordinary and application-admin passwords without the old password'
 
+# Authelia also supplies the old password to the password-modify extension.
+expect_fail ldappasswd -x -H "${URI}" -D "${TEST_MANAGEMENT_DN}" -w "${TEST_PASSWORD}" -a wrong-password -s "${NEXT_PASSWORD}" "${USER_DN}"
+expect_rc 0 ldappasswd -x -H "${URI}" -D "${TEST_MANAGEMENT_DN}" -w "${TEST_PASSWORD}" -a "${NEW_PASSWORD}" -s "${NEXT_PASSWORD}" "${USER_DN}"
+expect_rc 0 ldapwhoami -x -H "${URI}" -D "${USER_DN}" -w "${NEXT_PASSWORD}"
+expect_rc 0 ldappasswd -x -H "${URI}" -D "${TEST_MANAGEMENT_DN}" -w "${TEST_PASSWORD}" -s "${NEW_PASSWORD}" "${USER_DN}"
+ok 'management changes passwords with a verified old password without hash read/compare'
+
 if [[ "${TEST_MANAGEMENT_MODE}" = policy* && "${TEST_MANAGEMENT_MODE}" != "policy-disabled" ]]; then
     # Authelia's standard LDAP Modify also needs to work with pwdSafeModify=TRUE.
     expect_rc 0 bind_modify "${URI}" "${TEST_MANAGEMENT_DN}" <<LDIF
@@ -128,7 +135,7 @@ LDIF
     ok 'policy-enabled LDAP Modify hashes passwords and honors history visibility settings'
 fi
 
-# Write-only password access must not even permit comparison of stored hashes.
+# Password auth/write/manage access must not permit comparison of stored hashes.
 expect_rc 50 ldapcompare -x -H "${URI}" -D "${TEST_MANAGEMENT_DN}" -w "${TEST_PASSWORD}" "${USER_DN}" "userPassword:${NEW_PASSWORD}"
 
 expect_fail bind_modify "${URI}" "${TEST_MANAGEMENT_DN}" <<LDIF

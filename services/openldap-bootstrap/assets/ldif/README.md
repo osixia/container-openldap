@@ -135,7 +135,7 @@ its identifier, but cannot modify, rename, delete or reset its own account.
 Other service accounts, entries outside users/groups and `cn=config` stay protected.
 Use data root to rotate the directory administrator's password.
 
-Password resets use the same `=wm` privileges as management resets. With ppolicy,
+Password resets use the same write/manage privileges as management resets. With ppolicy,
 these administrative resets bypass quality, history-reuse and minimum-age checks;
 the application performing them must enforce the required password rules.
 This remains a powerful identity-management account: it can reset users' passwords
@@ -166,8 +166,10 @@ When ppolicy is enabled, `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_PPOLICY_ATTR
 is added (default `pwdHistory`). The combined list must not be empty.
 
 `63-database-management-acl.ldif.template` limits password writes to the users branch.
-Its `=wm` privileges allow administrative resets without the old password, without
-hash read/compare. With ppolicy, these resets bypass quality, history-reuse and
+Its `=wmx` privileges allow administrative resets without the old password and
+password changes that supply the old password, as Authelia does. The auth (`x`)
+bit lets OpenLDAP verify that password without granting hash read/compare.
+With ppolicy, these operations bypass quality, history-reuse and
 minimum-age checks: enforce password requirements in the application.
 Service accounts and configuration remain protected; other identities keep their
 usual ACLs.
