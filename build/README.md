@@ -24,7 +24,9 @@ After the shared version check, `tests/` runs integration scenarios on each buil
 - standard users/groups/services tree and management account: independent opt-ins,
   custom DNs and supplied OUs, generated passwords, user/group
   reads, password resets including application administrators, ppolicy-safe resets,
-  hidden hashes/history, and denied profile, membership, entry and service changes;
+  configurable hidden attributes with/without ppolicy, rejection of empty combined
+  lists, hidden hashes/history by default, and denied profile, membership, entry
+  and service changes;
 - global request limits: native defaults, custom values and incoming message size
   enforcement for anonymous and authenticated connections;
 - read-only bootstrap templates with projected-volume symlinks, custom overrides

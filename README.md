@@ -79,7 +79,7 @@ docker exec openldap container run -- \
   -b "dc=keycloakers,dc=org" "(objectClass=*)"
 ```
 
-A successful response returns the organization entry and the `cn=admin` account.
+A successful response returns the organization entry. The root DN `cn=admin` authenticates without requiring a directory entry.
 
 **Passing command-line arguments to OpenLDAP**
 
@@ -388,14 +388,16 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT` | Enable user/group reads and user password resets | `false` |
 | `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_DN` | Management account DN | `cn=management,${OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_DN}` |
 | `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_PASSWORD_HASHED` | Hashed management password; generated if empty when enabled | `` |
+| `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES` | Comma-separated attributes hidden from the management account | `userPassword,shadowLastChange` |
+| `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_PPOLICY_ATTRIBUTES` | Additional hidden attributes when ppolicy is enabled | `pwdHistory` |
 | `OPENLDAP_BOOTSTRAP_DATA_READONLY`                    | Enable read-only data account creation                                            | `false`                                                     |
 | `OPENLDAP_BOOTSTRAP_DATA_READONLY_DN`                 | DN of the read-only data account                                                  | `cn=readonly,${OPENLDAP_BOOTSTRAP_SUFFIX}`                  |
 | `OPENLDAP_BOOTSTRAP_DATA_READONLY_PASSWORD_HASHED`    | Hashed password of the read-only data account; generated if empty when enabled    | ``                                                          |
-| `OPENLDAP_BOOTSTRAP_MONITOR_ENABLED`                  | Enable monitor backend                                                            | `false`                                                     |
+| `OPENLDAP_BOOTSTRAP_MONITOR`                  | Enable monitor backend                                                            | `false`                                                     |
 | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY`                 | Enable read-only monitor account creation                                         | `false`                                                     |
 | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY_DN`              | DN of the read-only monitor account                                               | `cn=readonly-monitor,${OPENLDAP_BOOTSTRAP_SUFFIX}`          |
 | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY_PASSWORD_HASHED` | Hashed password of the read-only monitor account; generated if empty when enabled | ``                                                          |
-| `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED` | Log successful LDAP writes | `false` |
+| `OPENLDAP_BOOTSTRAP_AUDITLOG` | Log successful LDAP writes | `false` |
 | `OPENLDAP_BOOTSTRAP_AUDITLOG_FILE` | Audit LDIF file; requires a writable parent directory | `/var/log/openldap/audit.ldif` |
 | `OPENLDAP_BOOTSTRAP_LDIF_CONFIG_DIR`                  | Source directory for config LDIF bootstrap files                                  | `/container/services/openldap-bootstrap/assets/ldif/config` |
 | `OPENLDAP_BOOTSTRAP_LDIF_DATA_DIR`                    | Source directory for data LDIF bootstrap files                                    | `/container/services/openldap-bootstrap/assets/ldif/data`   |

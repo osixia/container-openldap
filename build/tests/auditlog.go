@@ -19,7 +19,7 @@ func AuditLog(ctx context.Context, client *dagger.Client, image *dagger.Containe
 		settings := env{}
 		file := "/var/log/openldap/audit.ldif"
 		if mode != "default" {
-			settings["OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED"] = "true"
+			settings["OPENLDAP_BOOTSTRAP_AUDITLOG"] = "true"
 		}
 		if mode == "custom" {
 			file = "/var/log/openldap/custom audit.ldif"

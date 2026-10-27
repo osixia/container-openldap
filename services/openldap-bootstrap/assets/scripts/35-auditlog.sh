@@ -6,7 +6,7 @@ set -euo pipefail
 # print commands and their arguments as they are executed
 container log level eq trace && set -x
 
-if [ "${OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED}" = "true" ]; then
+if [ "${OPENLDAP_BOOTSTRAP_AUDITLOG}" = "true" ]; then
 
     # shellcheck disable=SC1091
     source "/container/services/openldap-bootstrap/assets/scripts/helpers/common.sh"

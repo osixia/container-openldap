@@ -4,37 +4,37 @@ This directory contains LDAP Data Interchange Format (LDIF) files used to bootst
 
 Files with a `.template` extension use `${VARIABLE}` placeholders that are substituted with environment variables at runtime. Static `.ldif` files are applied as-is.
 
-Files are processed in lexicographic order within each directory (numerical prefixes control ordering).
+Rendered LDIF files are assembled in version-sort order (`sort -V`); numerical prefixes control ordering.
 
 ## Structure
 
 ```
 ldif/
 ├── config/          # OpenLDAP configuration database (cn=config)
-│   ├── base/              # Core configuration (always applied)
-│   ├── tls/               # TLS settings (OPENLDAP_BOOTSTRAP_TLS=true)
-│   ├── tls-required/      # Enforce TLS (OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true)
-│   ├── database-readonly/ # Read-only data DB user (OPENLDAP_BOOTSTRAP_DATA_READONLY=true)
-│   ├── data-management/   # Scoped application account ACLs (OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true)
-│   ├── monitor-readonly/  # Read-only monitor user (OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true)
-│   ├── auditlog/          # Audit file (OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED=true)
-│   ├── ppolicy/           # Password policy overlay (OPENLDAP_BOOTSTRAP_PPOLICY=true)
-│   ├── ppolicy-readonly/  # Hide history from the data read-only account (PPOLICY and DATA_READONLY enabled)
-│   ├── refint/            # Referential integrity overlay (OPENLDAP_BOOTSTRAP_REFINT=true)
-│   ├── unique/            # Unique attributes overlay (OPENLDAP_BOOTSTRAP_UNIQUE=true)
-│   ├── memberof/          # Memberof overlay (OPENLDAP_BOOTSTRAP_MEMBEROF=true)
-│   ├── replication/       # Replication (OPENLDAP_BOOTSTRAP_REPLICATION=true)
-│   └── custom/            # User-provided config LDIF files
+│   ├── base/                  # Core configuration (always applied)
+│   ├── tls/                   # TLS settings (OPENLDAP_BOOTSTRAP_TLS=true)
+│   ├── tls-required/          # Enforce TLS (OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true)
+│   ├── database-readonly/     # Read-only data DB user (OPENLDAP_BOOTSTRAP_DATA_READONLY=true)
+│   ├── database-management/   # Scoped application account ACLs (OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true)
+│   ├── monitor-readonly/      # Read-only monitor user (OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true)
+│   ├── auditlog/              # Audit file (OPENLDAP_BOOTSTRAP_AUDITLOG=true)
+│   ├── ppolicy/               # Password policy overlay (OPENLDAP_BOOTSTRAP_PPOLICY=true)
+│   ├── ppolicy-readonly/      # Hide history from the data read-only account (PPOLICY and DATA_READONLY enabled)
+│   ├── refint/                # Referential integrity overlay (OPENLDAP_BOOTSTRAP_REFINT=true)
+│   ├── unique/                # Unique attributes overlay (OPENLDAP_BOOTSTRAP_UNIQUE=true)
+│   ├── memberof/              # Memberof overlay (OPENLDAP_BOOTSTRAP_MEMBEROF=true)
+│   ├── replication/           # Replication (OPENLDAP_BOOTSTRAP_REPLICATION=true)
+│   └── custom/                # User-provided config LDIF files
 └── data/            # LDAP directory data (populated on first bootstrap)
-    ├── base/              # Root organization entry (always applied)
-    ├── data-tree/         # Users, groups and services OUs (OPENLDAP_BOOTSTRAP_DATA_TREE=true)
-    ├── data-management/   # Application account (OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true)
-    ├── database-readonly/ # Read-only account entry (OPENLDAP_BOOTSTRAP_DATA_READONLY=true)
-    ├── monitor-readonly/  # Read-only monitor account (OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true)
-    ├── ppolicy/           # Password policy group and default policy (OPENLDAP_BOOTSTRAP_PPOLICY=true)
-    ├── refint-nothing/    # Passwordless replacement role (REFINT enabled and NOTHING_DN set)
-    ├── replication/       # Replication service accounts (OPENLDAP_BOOTSTRAP_REPLICATION=true)
-    └── custom/            # User-provided data LDIF files
+    ├── base/                  # Root organization entry (always applied)
+    ├── data-tree/             # Users, groups and services OUs (OPENLDAP_BOOTSTRAP_DATA_TREE=true)
+    ├── database-management/   # Application account (OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true)
+    ├── database-readonly/     # Read-only account entry (OPENLDAP_BOOTSTRAP_DATA_READONLY=true)
+    ├── monitor-readonly/      # Read-only monitor account (OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true)
+    ├── ppolicy/               # Password policy group and default policy (OPENLDAP_BOOTSTRAP_PPOLICY=true)
+    ├── refint-nothing/        # Passwordless replacement role (REFINT enabled and NOTHING_DN set)
+    ├── replication/           # Replication service accounts (OPENLDAP_BOOTSTRAP_REPLICATION=true)
+    └── custom/                # User-provided data LDIF files
 ```
 
 ## Numbered prefix grouping behavior
@@ -79,22 +79,27 @@ Core OpenLDAP configuration applied on every bootstrap. Files are numbered to co
 
 ACL files ending in `-close.ldif` append a final `access to * by * none` rule to deny any unmatched access, ensuring a safe default.
 
-## data/data-tree and data/data-management
+## data/data-tree and data/database-management
 
 `OPENLDAP_BOOTSTRAP_DATA_TREE=true` creates `ou=users`, `ou=groups` and `ou=services`
 below the suffix. `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true` creates one account,
 by default `cn=management,ou=services,<suffix>`, to read users/groups and reset user
-passwords. It cannot edit profiles or groups or read password hashes/history.
+passwords. By default, it cannot edit profiles or groups or read password hashes/history.
 Both options are independent and disabled by default.
 
 The OU DNs, account DN and password hash are configurable through the matching
 `OPENLDAP_BOOTSTRAP_DATA_TREE_*_DN` and `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_*` variables.
 If custom LDIFs supply the OUs, leave tree creation disabled and load them before
-`80-data-management-account.ldif`. Do not duplicate automatically created OUs.
+`80-database-management-account.ldif`. Do not duplicate automatically created OUs.
 
-## config/data-management
+## config/database-management
 
-`63-data-management-acl.ldif.template` limits password writes to the users branch.
+`OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES` lists comma-separated
+attributes hidden from the management account (default `userPassword,shadowLastChange`).
+When ppolicy is enabled, `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_PPOLICY_ATTRIBUTES`
+is added (default `pwdHistory`). The combined list must not be empty.
+
+`63-database-management-acl.ldif.template` limits password writes to the users branch.
 Its `=wm` privileges allow administrative resets without the old password, without
 hash read/compare. With ppolicy, these resets bypass quality, history-reuse and
 minimum-age checks: enforce password requirements in the application.
@@ -155,7 +160,7 @@ docker run --name openldap \
   osixia/openldap:2.6.15-beta
 ```
 
-Put `.ldif` files in these directories, or use `.ldif.template` files with `${VARIABLE}` placeholders to substitute environment variables. Leave the mounts writable so bootstrap can convert templates into `.ldif` files.
+Put `.ldif` files in these directories, or use `.ldif.template` files with `${VARIABLE}` placeholders to substitute environment variables. The mounts may be read-only: bootstrap renders templates in a temporary writable copy.
 
 There are three ways to customize the bootstrap:
 

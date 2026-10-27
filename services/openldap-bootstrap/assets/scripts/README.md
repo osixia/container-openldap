@@ -16,9 +16,9 @@ Scripts are executed in numeric order. Most are feature-gated by an environment 
 | `10-tls.sh` | `OPENLDAP_BOOTSTRAP_TLS=true` | Applies TLS certificate and protocol configuration |
 | `15-tls-required.sh` | `OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true` | Enforces minimum 128-bit SSF (warns if TLS is not also enabled) |
 | `20-database-readonly.sh` | `OPENLDAP_BOOTSTRAP_DATA_READONLY=true` | Creates a read-only service account for the data database |
-| `25-data-management.sh` | `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true` | Creates one account below the services branch, reading users/groups and resetting user passwords without hash/history access or other write permissions |
+| `25-database-management.sh` | `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT=true` | Creates one account below the services branch, reading users/groups and resetting user passwords with configurable hidden attributes and no other write permissions |
 | `30-monitor-readonly.sh` | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY=true` | Creates a read-only service account for the monitor database |
-| `35-auditlog.sh` | `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED=true` | Configures file-based auditing on the data database |
+| `35-auditlog.sh` | `OPENLDAP_BOOTSTRAP_AUDITLOG=true` | Configures file-based auditing on the data database |
 | `40-refint.sh` | `OPENLDAP_BOOTSTRAP_REFINT=true` | Configures the referential integrity overlay and optional replacement DN |
 | `45-refint-nothing.sh` | `OPENLDAP_BOOTSTRAP_REFINT=true` and `OPENLDAP_BOOTSTRAP_REFINT_NOTHING_DN` non-empty | Creates the passwordless replacement role |
 | `50-ppolicy.sh` | `OPENLDAP_BOOTSTRAP_PPOLICY=true` | Configures password policy, hides history from the data read-only account while preserving normal ACL evaluation, and validates inactivity and progressive lockout prerequisites |

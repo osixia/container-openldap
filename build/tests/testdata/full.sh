@@ -49,6 +49,9 @@ ok "anonymous users cannot read the database"
 for node in "${NODES[@]}"; do
     uri="$(ldaps_uri "${node}")"
 
+    expect_rc 0 bind_search "${uri}" "${CONFIG_ADMIN_DN}" -b "cn=config" '(olcDatabase=monitor)' olcMonitoring
+    expect_output '^olcMonitoring: TRUE$'
+
     expect_rc 0 bind_search "${uri}" "${CONFIG_ADMIN_DN}" -b "cn=module{0},cn=config" -s base olcModuleLoad
     for module in ${TEST_MODULES}; do
         expect_output "^olcModuleLoad: \{[0-9]+\}${module}$"

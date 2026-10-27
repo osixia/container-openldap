@@ -21,7 +21,7 @@ func DataManagement(ctx context.Context, client *dagger.Client, image *dagger.Co
 		"OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_PASSWORD_HASHED": passwords["OPENLDAP_BOOTSTRAP_DATA_ROOT_PASSWORD_HASHED"],
 	})
 
-	for _, mode := range []string{"disabled", "tree", "plain", "policy", "custom", "supplied"} {
+	for _, mode := range []string{"disabled", "tree", "plain", "policy", "custom", "supplied", "hidden", "policy-hidden", "policy-only", "empty", "policy-disabled"} {
 		if err := func() error {
 			usersDN := "ou=users," + suffix
 			groupsDN := "ou=groups," + suffix
@@ -35,6 +35,19 @@ func DataManagement(ctx context.Context, client *dagger.Client, image *dagger.Co
 				settings["OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT"] = "false"
 			case "tree":
 				settings["OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT"] = "false"
+			case "hidden":
+				settings["OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES"] = "userPassword,shadowLastChange,mail"
+			case "policy-hidden", "policy-only", "empty":
+				settings["OPENLDAP_BOOTSTRAP_PPOLICY"] = "true"
+				settings["OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_PPOLICY_ATTRIBUTES"] = "pwdHistory,mail"
+				if mode == "policy-only" || mode == "empty" {
+					settings["OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES"] = ""
+				}
+				if mode == "empty" {
+					settings["OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_PPOLICY_ATTRIBUTES"] = ""
+				}
+			case "policy-disabled":
+				settings["OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_PPOLICY_ATTRIBUTES"] = "pwdHistory,mail"
 			case "policy":
 				settings = merge(settings, env{
 					"OPENLDAP_BOOTSTRAP_PPOLICY":                       "true",
@@ -42,7 +55,7 @@ func DataManagement(ctx context.Context, client *dagger.Client, image *dagger.Co
 					"OPENLDAP_BOOTSTRAP_REFINT":                        "true",
 					"OPENLDAP_BOOTSTRAP_REFINT_NOTHING_DN":             "cn=empty-group," + servicesDN,
 					"OPENLDAP_BOOTSTRAP_UNIQUE":                        "true",
-					"OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED":              "true",
+					"OPENLDAP_BOOTSTRAP_AUDITLOG":                      "true",
 					"OPENLDAP_BOOTSTRAP_DATA_READONLY":                 "true",
 					"OPENLDAP_BOOTSTRAP_DATA_READONLY_PASSWORD_HASHED": passwords["OPENLDAP_BOOTSTRAP_DATA_ROOT_PASSWORD_HASHED"],
 				})
@@ -72,6 +85,11 @@ ou: services
 				"OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_DN": servicesDN,
 				"OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_DN":    managementDN,
 			})
+			if mode == "empty" {
+				_, err := expect(ctx, withEnv(nodeImage, settings), false,
+					[]string{"Management hidden attributes must not be empty"}, "container", "--skip-process")
+				return err
+			}
 			node := "management-" + mode
 			service, err := startNode(ctx, nodeImage, node, settings, nil, nil)
 			if err != nil {

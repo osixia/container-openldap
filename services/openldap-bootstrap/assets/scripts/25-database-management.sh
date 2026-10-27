@@ -26,9 +26,12 @@ if [ "${OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT}" = "true" ]; then
 
         ensure_hashed_password OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_PASSWORD_HASHED "database management user"
 
-        OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES="userPassword,shadowLastChange"
-        if [ "${OPENLDAP_BOOTSTRAP_PPOLICY}" = "true" ]; then
-            OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES+=",pwdHistory"
+        if [ "${OPENLDAP_BOOTSTRAP_PPOLICY}" = "true" ] && [ -n "${OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_PPOLICY_ATTRIBUTES}" ]; then
+            OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES+="${OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES:+,}${OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_PPOLICY_ATTRIBUTES}"
+        fi
+
+        if [ -z "${OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES}" ]; then
+            container log fatal "Management hidden attributes must not be empty"
         fi
 
         prepare_env_file "${ENV_FILE}" OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_CN OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_PASSWORD_HASHED OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES
@@ -37,7 +40,7 @@ if [ "${OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT}" = "true" ]; then
         SOURCE_DIR="$2"
         OUTPUT_DIR="$3"
 
-        prepare_ldif_files "${SOURCE_DIR}/data-management" "${OUTPUT_DIR}"
+        prepare_ldif_files "${SOURCE_DIR}/database-management" "${OUTPUT_DIR}"
     fi
 
 fi

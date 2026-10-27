@@ -27,19 +27,19 @@ func AutomaticModules(ctx context.Context, client *dagger.Client, image *dagger.
 		{"default", nil, baseModules, false},
 		{"custom order", env{"OPENLDAP_BOOTSTRAP_MODULES": "back_mdb.so pw-sha2.so argon2.so memberof.so"}, "back_mdb.so pw-sha2.so argon2.so memberof.so", false},
 		{"explicit aliases", env{
-			"OPENLDAP_BOOTSTRAP_MODULES":          explicitModules,
-			"OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED": "true",
-			"OPENLDAP_BOOTSTRAP_PPOLICY":          "true",
-			"OPENLDAP_BOOTSTRAP_UNIQUE":           "true",
-			"OPENLDAP_BOOTSTRAP_REFINT":           "true",
-			"OPENLDAP_BOOTSTRAP_MEMBEROF":         "true",
+			"OPENLDAP_BOOTSTRAP_MODULES":  explicitModules,
+			"OPENLDAP_BOOTSTRAP_AUDITLOG": "true",
+			"OPENLDAP_BOOTSTRAP_PPOLICY":  "true",
+			"OPENLDAP_BOOTSTRAP_UNIQUE":   "true",
+			"OPENLDAP_BOOTSTRAP_REFINT":   "true",
+			"OPENLDAP_BOOTSTRAP_MEMBEROF": "true",
 		}, explicitModules, false},
 		{"missing explicit module", env{
 			"OPENLDAP_BOOTSTRAP_MODULES": baseModules,
 			"OPENLDAP_BOOTSTRAP_UNIQUE":  "true",
 		}, "", true},
 		{"all automatic", env{
-			"OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED":                   "true",
+			"OPENLDAP_BOOTSTRAP_AUDITLOG":                           "true",
 			"OPENLDAP_BOOTSTRAP_PPOLICY":                            "true",
 			"OPENLDAP_BOOTSTRAP_UNIQUE":                             "true",
 			"OPENLDAP_BOOTSTRAP_REFINT":                             "true",
@@ -49,7 +49,7 @@ func AutomaticModules(ctx context.Context, client *dagger.Client, image *dagger.
 		}, baseModules + " ppolicy.so unique.so refint.so memberof.so auditlog.so syncprov.so", false},
 	}
 	for _, feature := range []struct{ flag, module string }{
-		{"AUDITLOG_ENABLED", "auditlog"},
+		{"AUDITLOG", "auditlog"},
 		{"PPOLICY", "ppolicy"},
 		{"UNIQUE", "unique"},
 		{"REFINT", "refint"},

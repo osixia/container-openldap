@@ -77,7 +77,14 @@ expect_rc 0 bind_search "${URI}" "${TEST_MANAGEMENT_DN}" -b "${TEST_SUFFIX}" \
     '(&(uid=alice)(objectClass=inetOrgPerson))' uid displayName mail userPassword
 expect_output "^dn: ${USER_DN}$"
 expect_output '^displayName: Test User$'
-expect_output '^mail: alice@example.org$'
+case "${TEST_MANAGEMENT_MODE}" in
+    hidden|policy-hidden|policy-only)
+        expect_no_output '^mail:'
+        ;;
+    *)
+        expect_output '^mail: alice@example.org$'
+        ;;
+esac
 expect_no_output '^userPassword:'
 expect_rc 0 bind_search "${URI}" "${TEST_MANAGEMENT_DN}" -b "${TEST_GROUPS_DN}" \
     "(&(member=${APP_ADMIN_DN})(objectClass=groupOfNames))" cn member
@@ -96,7 +103,7 @@ for dn in "${USER_DN}" "${APP_ADMIN_DN}"; do
 done
 ok 'management resets ordinary and application-admin passwords without the old password'
 
-if [ "${TEST_MANAGEMENT_MODE}" = "policy" ]; then
+if [[ "${TEST_MANAGEMENT_MODE}" = policy* && "${TEST_MANAGEMENT_MODE}" != "policy-disabled" ]]; then
     # Authelia's standard LDAP Modify also needs to work with pwdSafeModify=TRUE.
     expect_rc 0 bind_modify "${URI}" "${TEST_MANAGEMENT_DN}" <<LDIF
 dn: ${USER_DN}
@@ -109,13 +116,16 @@ LDIF
     expect_output '^userPassword:: '
     expect_output '^pwdHistory:'
     expect_rc 0 bind_search "${URI}" "${TEST_MANAGEMENT_DN}" -b "${USER_DN}" -s base userPassword pwdHistory
-    expect_no_output '^(userPassword|pwdHistory):'
-    expect_rc 0 bind_search "${URI}" "cn=readonly,${TEST_SUFFIX}" -b "${USER_DN}" -s base cn pwdHistory
+    expect_no_output '^userPassword:'
     expect_no_output '^pwdHistory:'
-    expect_fail ldappasswd -x -H "${URI}" -D "cn=readonly,${TEST_SUFFIX}" -w "${TEST_PASSWORD}" -s "${NEW_PASSWORD}" "${USER_DN}"
+    if [ "${TEST_MANAGEMENT_MODE}" = "policy" ]; then
+        expect_rc 0 bind_search "${URI}" "cn=readonly,${TEST_SUFFIX}" -b "${USER_DN}" -s base cn pwdHistory
+        expect_no_output '^pwdHistory:'
+        expect_fail ldappasswd -x -H "${URI}" -D "cn=readonly,${TEST_SUFFIX}" -w "${TEST_PASSWORD}" -s "${NEW_PASSWORD}" "${USER_DN}"
+    fi
     expect_fail ldappasswd -x -H "${URI}" -D "${APP_ADMIN_DN}" -w "${NEW_PASSWORD}" -a "${NEW_PASSWORD}" -s short
     expect_output 'quality|too short|Constraint violation'
-    ok 'policy-enabled LDAP Modify hashes passwords and keeps history private'
+    ok 'policy-enabled LDAP Modify hashes passwords and honors history visibility settings'
 fi
 
 # Write-only password access must not even permit comparison of stored hashes.

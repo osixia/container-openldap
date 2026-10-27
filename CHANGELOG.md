@@ -6,10 +6,13 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Added
 
+- Expose management account hidden attributes through
+  `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES` and
+  `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_PPOLICY_ATTRIBUTES`.
 - Add optional `OPENLDAP_BOOTSTRAP_DATA_TREE` to create users, groups and services
   OUs, and `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT` for one scoped application account.
-  It reads users/groups and resets user passwords, including with ppolicy safe
-  modification, without hash/history reads or writes to profiles, memberships,
+  By default, it reads users/groups and resets user passwords, including with ppolicy
+  safe modification, without hash/history reads or writes to profiles, memberships,
   service accounts or configuration. Both features are disabled by default.
 - Add `openldap-ctl validate-ldif` for files and directories to check data entry LDIF
   syntax, values and schemas without importing entries or stopping slapd.
@@ -25,7 +28,7 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
   contents change, ignoring duplicate events and unchanged projected volumes.
 - Default `OPENLDAP_BOOTSTRAP_MODULES` to `auto` to load base and enabled feature
   modules; explicit lists retain full control over module selection and order.
-- Add optional file-based auditing with `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED`
+- Add optional file-based auditing with `OPENLDAP_BOOTSTRAP_AUDITLOG`
   and `OPENLDAP_BOOTSTRAP_AUDITLOG_FILE`.
 - Add `OPENLDAP_BOOTSTRAP_DATA_LAST_BIND` and `OPENLDAP_BOOTSTRAP_DATA_LAST_BIND_PRECISION`
   to track successful LDAP authentications in `pwdLastSuccess` (disabled by default).
@@ -34,6 +37,16 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
   DN disables both, preserving the default behavior.
 - Test default behavior, automatic role creation and preservation of a group after
   deletion of its last real member.
+
+### Changed
+
+- Rename bootstrap feature flags `OPENLDAP_BOOTSTRAP_MONITOR_ENABLED` and
+  `OPENLDAP_BOOTSTRAP_AUDITLOG_ENABLED` to `OPENLDAP_BOOTSTRAP_MONITOR` and
+  `OPENLDAP_BOOTSTRAP_AUDITLOG`. Update deployment environments to the new names;
+  the previous names are no longer read.
+- Align management bootstrap scripts, directories and LDIF filenames with the
+  existing `database-readonly` convention by using `database-management`.
+  Custom LDIF overrides must use the new filenames.
 
 ### Fixed
 
