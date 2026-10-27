@@ -20,11 +20,16 @@ if [ "${OPENLDAP_BOOTSTRAP_REFINT}" = "true" ]; then
     if [ "${TYPE}" = "env" ]; then
         ENV_FILE="$2"
 
+        OPENLDAP_BOOTSTRAP_REFINT_LDIF=""
         for attribute in ${OPENLDAP_BOOTSTRAP_REFINT_ATTRIBUTES}; do
-            OPENLDAP_BOOTSTRAP_REFINT_ATTRIBUTES_LDIF+="olcRefintAttribute: ${attribute}"$'\n'
+            OPENLDAP_BOOTSTRAP_REFINT_LDIF+="olcRefintAttribute: ${attribute}"$'\n'
         done
 
-        prepare_env_file "${ENV_FILE}" OPENLDAP_BOOTSTRAP_REFINT_ATTRIBUTES_LDIF
+        if [ -n "${OPENLDAP_BOOTSTRAP_REFINT_NOTHING_DN}" ]; then
+            OPENLDAP_BOOTSTRAP_REFINT_LDIF+="olcRefintNothing: ${OPENLDAP_BOOTSTRAP_REFINT_NOTHING_DN}"
+        fi
+
+        prepare_env_file "${ENV_FILE}" OPENLDAP_BOOTSTRAP_REFINT_LDIF
 
     elif [ "${TYPE}" = "ldif" ]; then
         SOURCE_DIR="$2"

@@ -37,8 +37,8 @@ github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/mitchellh/go-homedir v1.1.0 h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG+4E0Y=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
-github.com/osixia/dagger-build v0.0.0-20261015194426-55e8bdd25dbb h1:V8FLn00GbtrHvOTII63DaCSZDoi2zQvmIztr20FmOw4=
-github.com/osixia/dagger-build v0.0.0-20261015194426-55e8bdd25dbb/go.mod h1:gxxc7tVjlUVYPeBpDBdWs1MFHuP48AR6zes7F1NIMKI=
+github.com/osixia/dagger-build v0.0.0-20261016204440-cdddcccbc11c h1:xxoEJ8RLtMVqK5WSHRTSxXPL9z9bh9B3EAQW5/hVyQM=
+github.com/osixia/dagger-build v0.0.0-20261016204440-cdddcccbc11c/go.mod h1:gxxc7tVjlUVYPeBpDBdWs1MFHuP48AR6zes7F1NIMKI=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=

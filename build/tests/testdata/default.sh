@@ -39,6 +39,10 @@ ok "authenticated users can read allowed attributes"
 expect_rc 0 bind_search "${URI}" "${CONFIG_ADMIN_DN}" -b "cn=config" -s base dn
 ok "config admin can read cn=config"
 
+expect_rc 0 bind_search "${URI}" "${CONFIG_ADMIN_DN}" -b "cn=config" '(olcDatabase=monitor)' olcMonitoring
+expect_output '^olcMonitoring: FALSE$'
+ok "monitoring is disabled by default"
+
 expect_rc 0 bind_search "${URI}" "${CONFIG_ADMIN_DN}" -b "cn=schema,cn=config" -s one cn
 for schema in ${TEST_SCHEMAS}; do
     expect_output "^cn: \{[0-9]+\}${schema%.ldif}$"

@@ -19,34 +19,33 @@ type scenario struct {
 
 var scenarios = []scenario{
 	{"default bootstrap", Default},
+	{"standard data tree and management account", DataManagement},
+	{"scoped directory administrator", DataAdmin},
+	{"global request limits", GlobalLimits},
+	{"read-only bootstrap templates", ReadOnlyTemplates},
 	{"alternative schemas", AlternativeSchemas},
+	{"TLS certificate reload", TLSReload},
+	{"automatic module loading", AutomaticModules},
+	{"audit logging", AuditLog},
+	{"last successful binds", LastBind},
+	{"password history privacy", PasswordPolicyHistory},
+	{"password policy inactivity", PasswordPolicyIdle},
+	{"progressive password policy lockouts", PasswordPolicyDelay},
+	{"password helpers", PasswordHelpers},
+	{"LDIF validation", ValidateLDIF},
+	{"refint empty-group placeholders", RefintNothing},
 	{"all features with 3 replicated nodes", AllFeatures},
 	{"backup and restore", BackupRestore},
 	{"upgrade", Upgrade},
 	{"upgrade from previous releases", UpgradeFromPreviousReleases},
 }
 
-// Run checks OpenLDAP behavior after the reusable job's version check, only on the engine
-// platform: emulated images are slow and fail as Dagger services.
+// Run checks OpenLDAP behavior after the reusable job's version check. CI builds each arch
+// on a native runner: run locally with --arches matching the host to avoid emulation.
 func Run(ctx context.Context, client *dagger.Client, builds []*job.BuildResult) error {
 
-	enginePlatform, err := client.DefaultPlatform(ctx)
-	if err != nil {
-		return fmt.Errorf("engine platform: %w", err)
-	}
-
-	tested := 0
 	for _, build := range builds {
 		for _, image := range build.Containers {
-
-			platform, err := image.Platform(ctx)
-			if err != nil {
-				return fmt.Errorf("image platform: %w", err)
-			}
-			if platform != enginePlatform {
-				continue
-			}
-			tested++
 
 			for _, s := range scenarios {
 				log.Printf("scenario: %s ...", s.name)
@@ -59,10 +58,6 @@ func Run(ctx context.Context, client *dagger.Client, builds []*job.BuildResult) 
 				log.Printf("scenario: %s passed", s.name)
 			}
 		}
-	}
-
-	if tested == 0 && len(builds) > 0 {
-		return fmt.Errorf("no image built for the engine platform %v", enginePlatform)
 	}
 
 	return nil

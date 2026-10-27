@@ -2,6 +2,11 @@
 
 Guidance for coding agents working on `osixia/openldap` (v2), an OpenLDAP container image built on [osixia/baseimage](https://github.com/osixia/container-baseimage) (Alpine).
 
+## Documentation
+
+- Keep the main `README.md` concise and simple. For new options, add only the required environment-variable table rows there; put explanations in the relevant service README.
+- Document bootstrap features briefly alongside the other features in the existing bootstrap READMEs. Do not create a separate documentation page for a small feature unless explicitly requested, and do not add feature explanations to the main README.
+
 ## Repository layout
 
 | Path | Role |

@@ -1,0 +1,28 @@
+# Let directory clients retrieve the administrator's entry after binding.
+olcAccess: to dn.base="${OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN}" attrs=userPassword,shadowLastChange
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN}" none
+  by * break
+olcAccess: to dn.base="${OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN}"
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN}" read
+  by * break
+olcAccess: to dn.subtree="${OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_DN}"
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN}" none
+  by * break
+olcAccess: to dn.subtree="${OPENLDAP_BOOTSTRAP_DATA_TREE_USERS_DN}" attrs=userPassword
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN}" =wm
+  by * break
+olcAccess: to attrs=userPassword,shadowLastChange
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN}" none
+  by * break
+olcAccess: to dn.subtree="${OPENLDAP_BOOTSTRAP_DATA_TREE_USERS_DN}"
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN}" write
+  by * break
+olcAccess: to dn.subtree="${OPENLDAP_BOOTSTRAP_DATA_TREE_GROUPS_DN}"
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN}" write
+  by * break
+olcAccess: to dn.base="${OPENLDAP_BOOTSTRAP_SUFFIX}" attrs=entry,objectClass,o,dc
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN}" read
+  by * break
+olcAccess: to *
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN}" none
+  by * break

@@ -25,6 +25,7 @@
   - [🔁 Replication](#-replication)
   - [🛠️ LDAP Toolkit](#️-ldap-toolkit)
     - [OpenLDAP Utilities](#openldap-utilities)
+    - [Validate LDIF](#validate-ldif)
     - [Password Helpers](#password-helpers)
     - [Convert Schema to LDIF](#convert-schema-to-ldif)
   - [🔤 Environment Variables](#-environment-variables)
@@ -40,7 +41,7 @@ Run a basic OpenLDAP server:
 docker run --name openldap --hostname ldap.example.org -p 389:3890 -p 636:6360 \
   -e OPENLDAP_BOOTSTRAP_ORGANIZATION="Keycloakers Org" \
   -e OPENLDAP_BOOTSTRAP_SUFFIX="dc=keycloakers,dc=org" \
-  osixia/openldap:2.6.15-beta
+  osixia/openldap:2.6.15-rc
 ```
 
 For persistent deployments, mount config, data, and backup directories:
@@ -52,7 +53,7 @@ docker run --name openldap --hostname ldap.example.org -p 389:3890 -p 636:6360 \
   -v openldap-conf:/etc/openldap/slapd.d \
   -v openldap-data:/var/lib/openldap/openldap-data \
   -v openldap-backups:/var/lib/openldap/openldap-backups \
-  osixia/openldap:2.6.15-beta
+  osixia/openldap:2.6.15-rc
 ```
 
 Notes:
@@ -69,16 +70,16 @@ Retrieve the generated admin password from the container logs:
 docker logs openldap 2>&1 | grep -i password
 ```
 
-Then search the base DN to confirm the server is responding:
+Then search the base DN to confirm the server is responding, replacing `<database root password>` with the password from the logs:
 
 ``` bash
 docker exec openldap container run -- \
   ldapsearch -H ldap://localhost:3890 \
-  -D "cn=admin,dc=keycloakers,dc=org" -w <database root password> \
+  -D "cn=admin,dc=keycloakers,dc=org" -w '<database root password>' \
   -b "dc=keycloakers,dc=org" "(objectClass=*)"
 ```
 
-A successful response returns the organization entry and the `cn=admin` account.
+A successful response returns the organization entry. The root DN `cn=admin` authenticates without requiring a directory entry.
 
 **Passing command-line arguments to OpenLDAP**
 
@@ -87,7 +88,7 @@ The `osixia/openldap` container allows you to pass additional command-line argum
 Arguments specified after `--` are forwarded to the slapd process inside the container:
 
 ``` bash
-docker run osixia/openldap:2.6.15-beta -- -d -1
+docker run osixia/openldap:2.6.15-rc -- -d -1
 ```
 
 **Customizing bootstrap configuration and data**
@@ -103,21 +104,21 @@ The `--log-level debug --bash` options from `osixia/baseimage` enables debug log
 If OpenLDAP keeps crashing, you can add `--skip-process` to start the container without launching service processes.
 
 ``` bash
-docker run -it osixia/openldap:2.6.15-beta --log-level debug --bash
-docker run -it osixia/openldap:2.6.15-beta --skip-process --log-level debug --bash
+docker run -it osixia/openldap:2.6.15-rc --log-level debug --bash
+docker run -it osixia/openldap:2.6.15-rc --skip-process --log-level debug --bash
 ```
 
 You can also increase the OpenLDAP daemon (`slapd`) log level with `OPENLDAP_DEBUG_LEVEL`:
 ``` bash
-docker run -e OPENLDAP_DEBUG_LEVEL=-1 osixia/openldap:2.6.15-beta
+docker run -e OPENLDAP_DEBUG_LEVEL=-1 osixia/openldap:2.6.15-rc
 ```
 
 > `OPENLDAP_DEBUG_LEVEL` only affects OpenLDAP (`slapd`) logging. To increase container/runtime logs, use the baseimage flag `--log-level` (for example `--log-level debug`).
 
 To see all available command-line options:
 ``` bash
-docker run --rm osixia/openldap:2.6.15-beta --help # osixia/baseimage options
-docker run --rm osixia/openldap:2.6.15-beta -x openldap -- --help # slapd command-line options
+docker run --rm osixia/openldap:2.6.15-rc --help # osixia/baseimage options
+docker run --rm osixia/openldap:2.6.15-rc -x openldap -- --help # slapd command-line options
 ```
 
 ## 🛟 Backup / Restore
@@ -159,7 +160,7 @@ docker run --name openldap-cron \
   -v openldap-conf:/etc/openldap/slapd.d \
   -v openldap-data:/var/lib/openldap/openldap-data \
   -v openldap-backups:/var/lib/openldap/openldap-backups \
-  osixia/openldap:2.6.15-beta -x openldap-cron
+  osixia/openldap:2.6.15-rc -x openldap-cron
 ```
 
 See the `OPENLDAP_CRON_JOB` environment variable to adjust the cron schedule and behavior.
@@ -180,10 +181,12 @@ The simplest way is to mount a directory that contains files with exactly those 
 docker run --name openldap --hostname ldap.example.org -p 389:3890 -p 636:6360 \
   -e OPENLDAP_BOOTSTRAP_TLS=true \
   -v $PWD/certs:/container/services/openldap/assets/certs \
-  osixia/openldap:2.6.15-beta
+  osixia/openldap:2.6.15-rc
 ```
 
 If you also set `OPENLDAP_BOOTSTRAP_TLS_REQUIRED=true`, bootstrap adds TLS-required access rules. That setting is stricter than plain TLS enablement and is intended for deployments where non-TLS client access should be rejected.
+
+The optional `openldap-tls-reload` service restarts slapd when certificate contents change. See [certificate renewal](https://opensource.osixia.net/projects/container-images/openldap/tls/#renewing-certificates).
 
 ## 🔁 Replication
 
@@ -209,7 +212,7 @@ docker run --name ldap1 --network openldap-net --hostname ldap1.example.org \
   -e OPENLDAP_BOOTSTRAP_REPLICATION=true \
   -e OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS="ldap://ldap1.example.org:3890 ldap://ldap2.example.org:3890" \
   -e OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD="passw0rd" \
-  osixia/openldap:2.6.15-beta
+  osixia/openldap:2.6.15-rc
 ```
 
 Minimal example for `ldap2.example.org`:
@@ -222,7 +225,7 @@ docker run --name ldap2 --network openldap-net --hostname ldap2.example.org \
   -e OPENLDAP_BOOTSTRAP_REPLICATION=true \
   -e OPENLDAP_BOOTSTRAP_REPLICATION_HOSTS="ldap://ldap1.example.org:3890 ldap://ldap2.example.org:3890" \
   -e OPENLDAP_BOOTSTRAP_REPLICATION_DATA_READONLY_PASSWORD="passw0rd" \
-  osixia/openldap:2.6.15-beta
+  osixia/openldap:2.6.15-rc
 ```
 
 If TLS is required for replication, set `OPENLDAP_BOOTSTRAP_REPLICATION_TLS=true` or rely on its default value from `OPENLDAP_BOOTSTRAP_TLS_REQUIRED`.
@@ -235,7 +238,7 @@ This image ships with the full suite of OpenLDAP utilities — both server-side 
 
 **Database tools**
 
-`slapcat`, `slapadd`, `slapindex`, and `slaptest` operate directly on the local database files and must run inside the container.
+`slapcat`, `slapadd`, `slapindex`, and `slaptest` operate directly on local configuration and database files. They can also run in a temporary container with the corresponding volumes mounted.
 
 Export the data database to LDIF:
 
@@ -258,7 +261,7 @@ docker exec openldap container run -- slapcat -n 0
 Search for all entries under a base DN:
 
 ``` bash
-docker run --rm osixia/openldap:2.6.15-beta run -- \
+docker run --rm osixia/openldap:2.6.15-rc run -- \
   ldapsearch -H ldap://172.16.0.1 \
   -D "cn=admin,dc=example,dc=org" -w passw0rd \
   -b "dc=example,dc=org" "(objectClass=*)"
@@ -267,7 +270,7 @@ docker run --rm osixia/openldap:2.6.15-beta run -- \
 Verify bind credentials:
 
 ``` bash
-docker run --rm osixia/openldap:2.6.15-beta run -- \
+docker run --rm osixia/openldap:2.6.15-rc run -- \
   ldapwhoami -H ldap://172.16.0.1 \
   -D "cn=admin,dc=example,dc=org" -w passw0rd
 ```
@@ -276,7 +279,7 @@ Add entries from a local LDIF file:
 
 ``` bash
 docker run --rm -v /path/to/entries.ldif:/tmp/entries.ldif \
-  osixia/openldap:2.6.15-beta run -- \
+  osixia/openldap:2.6.15-rc run -- \
   ldapadd -H ldap://172.16.0.1 \
   -D "cn=admin,dc=example,dc=org" -w passw0rd \
   -f /tmp/entries.ldif
@@ -285,31 +288,57 @@ docker run --rm -v /path/to/entries.ldif:/tmp/entries.ldif \
 Change a user's password:
 
 ``` bash
-docker run --rm osixia/openldap:2.6.15-beta run -- \
+docker run --rm osixia/openldap:2.6.15-rc run -- \
   ldappasswd -H ldap://172.16.0.1 \
   -D "cn=admin,dc=example,dc=org" -w passw0rd \
   -s newpassword "uid=jdoe,ou=people,dc=example,dc=org"
 ```
+
+### Validate LDIF
+
+Check data entries against the instance's initialized configuration without importing them or stopping slapd:
+
+```bash
+docker exec openldap container run -- openldap-ctl validate-ldif /data/users.ldif
+```
+
+Pass multiple file paths or a directory; all paths must be accessible inside the container.
+Directories are searched recursively for `*.ldif`, sorted by version and excluding hidden paths.
+Each file must contain complete entries. All files are checked; any validation failure returns a non-zero status.
+Checks LDIF syntax, attribute values and schemas. Does not check existing entries,
+ACLs or overlay rules, and does not accept `ldapmodify` change records.
 
 ### Password Helpers
 
 Generate a random password:
 
 ``` bash
-docker run --rm osixia/openldap:2.6.15-beta run -- openldap-ctl password generate
+docker run --rm osixia/openldap:2.6.15-rc run -- openldap-ctl password generate
 ```
 
 Hash a password:
 
 ``` bash
-docker run --rm osixia/openldap:2.6.15-beta run -- openldap-ctl password hash passw0rd
+docker run --rm osixia/openldap:2.6.15-rc run -- openldap-ctl password hash passw0rd
 ```
+
+Read a password from a mounted secret or standard input:
+
+```bash
+docker run --rm --user "$UID" -v "$PWD/password.txt:/run/secrets/password:ro" \
+  osixia/openldap:2.6.15-rc run -- openldap-ctl password hash --file /run/secrets/password
+docker run --rm -i osixia/openldap:2.6.15-rc run -- \
+  openldap-ctl password hash --stdin < password.txt
+```
+
+Contents are hashed exactly, including trailing newlines. Use `hash -- password`
+for a literal password named `--file`, `--stdin` or `--`.
 
 ### Convert Schema to LDIF
 
 ``` bash
 docker run --rm --user $UID -v $(pwd)/schema:/data   \
-  osixia/openldap:2.6.15-beta run -- openldap-ctl schema2ldif /data/test.schema
+  osixia/openldap:2.6.15-rc run -- openldap-ctl schema2ldif /data/test.schema
 ```
 
 ## 🔤 Environment Variables
@@ -335,24 +364,45 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | ----------------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------- |
 | `OPENLDAP_BOOTSTRAP_ORGANIZATION`                     | Organization name used in bootstrap data                                          | `Example Org`                                               |
 | `OPENLDAP_BOOTSTRAP_SUFFIX`                           | Base LDAP suffix; must start with `dc=`                                           | `dc=example,dc=org`                                         |
-| `OPENLDAP_BOOTSTRAP_MODULES`                          | OpenLDAP modules loaded during bootstrap                                          | `back_mdb.so argon2.so ppolicy.so unique.so refint.so memberof.so syncprov.so` |
+| `OPENLDAP_BOOTSTRAP_MODULES` | `auto`: base and enabled feature modules; an explicit list sets the exact modules and order | `auto` |
 | `OPENLDAP_BOOTSTRAP_SCHEMAS`                          | LDIF schemas imported during bootstrap                                            | `core.ldif cosine.ldif inetorgperson.ldif rfc2307bis.ldif`  |
 | `OPENLDAP_BOOTSTRAP_GLOBAL_SIZE_LIMIT`                         | Global LDAP size limit                                                            | `500`                                                       |
 | `OPENLDAP_BOOTSTRAP_GLOBAL_TIME_LIMIT`                         | Global LDAP time limit                                                            | `120`                                                       |
 | `OPENLDAP_BOOTSTRAP_GLOBAL_IDLE_TIMEOUT`                       | Global LDAP idle timeout                                                          | `3600`                                                      |
+| `OPENLDAP_BOOTSTRAP_GLOBAL_WRITE_TIMEOUT` | Timeout for blocked network writes, in seconds (`0`: disabled) | `0` |
+| `OPENLDAP_BOOTSTRAP_GLOBAL_CONN_MAX_PENDING` | Maximum pending requests per anonymous connection | `100` |
+| `OPENLDAP_BOOTSTRAP_GLOBAL_CONN_MAX_PENDING_AUTH` | Maximum pending requests per authenticated connection | `1000` |
+| `OPENLDAP_BOOTSTRAP_GLOBAL_SOCKBUF_MAX_INCOMING` | Maximum incoming LDAP message size for anonymous connections, in bytes | `262143` |
+| `OPENLDAP_BOOTSTRAP_GLOBAL_SOCKBUF_MAX_INCOMING_AUTH` | Maximum incoming LDAP message size for authenticated connections, in bytes | `4194303` |
 | `OPENLDAP_BOOTSTRAP_FRONTEND_PASSWORD_HASH`                      | Password hash scheme configured in `olcPasswordHash`                              | `{ARGON2}`                                                  |
 | `OPENLDAP_BOOTSTRAP_CONFIG_ROOT_DN`                   | Root DN for `cn=config`                                                           | `cn=admin,cn=config`                                        |
 | `OPENLDAP_BOOTSTRAP_CONFIG_ROOT_PASSWORD_HASHED`      | Hashed password for `cn=config`; generated if empty                               | ``                                                          |
 | `OPENLDAP_BOOTSTRAP_DATA_DATABASE_MAX_SIZE`           | MDB max size for main database                                                    | `10737418240`                                               |
+| `OPENLDAP_BOOTSTRAP_DATA_LAST_BIND` | Track successful LDAP authentications in `pwdLastSuccess` | `false` |
+| `OPENLDAP_BOOTSTRAP_DATA_LAST_BIND_PRECISION` | Minimum interval between `pwdLastSuccess` updates, in seconds | `3600` |
 | `OPENLDAP_BOOTSTRAP_DATA_ROOT_DN`                     | Root DN for main database                                                         | `cn=admin,${OPENLDAP_BOOTSTRAP_SUFFIX}`                     |
 | `OPENLDAP_BOOTSTRAP_DATA_ROOT_PASSWORD_HASHED`        | Hashed password for main database root DN; generated if empty                     | ``                                                          |
+| `OPENLDAP_BOOTSTRAP_DATA_TREE` | Create the users, groups and services OUs | `false` |
+| `OPENLDAP_BOOTSTRAP_DATA_TREE_USERS_DN` | Users OU DN | `ou=users,${OPENLDAP_BOOTSTRAP_SUFFIX}` |
+| `OPENLDAP_BOOTSTRAP_DATA_TREE_GROUPS_DN` | Groups OU DN | `ou=groups,${OPENLDAP_BOOTSTRAP_SUFFIX}` |
+| `OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_DN` | Services OU DN | `ou=services,${OPENLDAP_BOOTSTRAP_SUFFIX}` |
+| `OPENLDAP_BOOTSTRAP_DATA_ADMIN` | Create an account to administer users and groups | `false` |
+| `OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN` | Scoped administrator DN | `cn=admin,${OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_DN}` |
+| `OPENLDAP_BOOTSTRAP_DATA_ADMIN_PASSWORD_HASHED` | Hashed administrator password; generated if empty when enabled | `` |
+| `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT` | Enable user/group reads and user password resets | `false` |
+| `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_DN` | Management account DN | `cn=management,${OPENLDAP_BOOTSTRAP_DATA_TREE_SERVICES_DN}` |
+| `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_PASSWORD_HASHED` | Hashed management password; generated if empty when enabled | `` |
+| `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES` | Comma-separated attributes hidden from the management account | `userPassword,shadowLastChange` |
+| `OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_PPOLICY_ATTRIBUTES` | Additional hidden attributes when ppolicy is enabled | `pwdHistory` |
 | `OPENLDAP_BOOTSTRAP_DATA_READONLY`                    | Enable read-only data account creation                                            | `false`                                                     |
 | `OPENLDAP_BOOTSTRAP_DATA_READONLY_DN`                 | DN of the read-only data account                                                  | `cn=readonly,${OPENLDAP_BOOTSTRAP_SUFFIX}`                  |
 | `OPENLDAP_BOOTSTRAP_DATA_READONLY_PASSWORD_HASHED`    | Hashed password of the read-only data account; generated if empty when enabled    | ``                                                          |
-| `OPENLDAP_BOOTSTRAP_MONITOR_ENABLED`                  | Enable monitor backend                                                            | `false`                                                     |
+| `OPENLDAP_BOOTSTRAP_MONITOR`                  | Enable monitor backend                                                            | `false`                                                     |
 | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY`                 | Enable read-only monitor account creation                                         | `false`                                                     |
 | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY_DN`              | DN of the read-only monitor account                                               | `cn=readonly-monitor,${OPENLDAP_BOOTSTRAP_SUFFIX}`          |
 | `OPENLDAP_BOOTSTRAP_MONITOR_READONLY_PASSWORD_HASHED` | Hashed password of the read-only monitor account; generated if empty when enabled | ``                                                          |
+| `OPENLDAP_BOOTSTRAP_AUDITLOG` | Log successful LDAP writes | `false` |
+| `OPENLDAP_BOOTSTRAP_AUDITLOG_FILE` | Audit LDIF file; requires a writable parent directory | `/var/log/openldap/audit.ldif` |
 | `OPENLDAP_BOOTSTRAP_LDIF_CONFIG_DIR`                  | Source directory for config LDIF bootstrap files                                  | `/container/services/openldap-bootstrap/assets/ldif/config` |
 | `OPENLDAP_BOOTSTRAP_LDIF_DATA_DIR`                    | Source directory for data LDIF bootstrap files                                    | `/container/services/openldap-bootstrap/assets/ldif/data`   |
 | `OPENLDAP_BOOTSTRAP_SCRIPTS_DIR`                      | Source directory for bootstrap scripts                                            | `/container/services/openldap-bootstrap/assets/scripts`     |
@@ -375,6 +425,7 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | -------------------------------------- | --------------------------------------------- | ----------------------------------- |
 | `OPENLDAP_BOOTSTRAP_REFINT`            | Enable the `refint` overlay during bootstrap  | `false`                             |
 | `OPENLDAP_BOOTSTRAP_REFINT_ATTRIBUTES` | Attributes maintained by the `refint` overlay | `member uniqueMember manager owner` |
+| `OPENLDAP_BOOTSTRAP_REFINT_NOTHING_DN` | Replacement DN for empty groups; automatically creates a passwordless role when set | `` |
 
 **PPolicy**
 
@@ -397,9 +448,20 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_FAILURE_COUNT_INTERVAL` | Value for `pwdFailureCountInterval`                     | `300`                                              |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT`                | Value for `pwdLockout`                                  | `true`                                             |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT_DURATION`       | Value for `pwdLockoutDuration`                          | `900`                                              |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MIN_DELAY`              | Initial per-account lockout after a failed bind, in seconds (`0`: disabled) | `0` |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_DELAY`              | Maximum progressive lockout in seconds; requires `0 < MIN_DELAY <= MAX_DELAY` and policy lockout enabled | `0` |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_AGE`                | Value for `pwdMaxAge`                                   | `7776000`                                          |
+| `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_IDLE`               | Maximum inactivity in seconds (`0`: disabled); requires last bind tracking and policy lockout | `0` |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_EXPIRE_WARNING`         | Value for `pwdExpireWarning`                            | `1209600`                                          |
 | `OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_GRACE_AUTH_NLIMIT`      | Value for `pwdGraceAuthNLimit`                          | `3`                                                |
+
+When ppolicy and the data read-only account are enabled, bootstrap explicitly
+denies that account access to `pwdHistory` before its general read grant. Other
+identities continue through the usual ACLs: administrators and replication retain
+access, while ordinary users are denied by the final catch-all unless a custom
+ACL grants access. Override `64-database-readonly-ppolicy-acl.ldif` through the
+custom config directory to change the read-only restriction. This ACL is added
+on new bootstraps only; existing databases need an explicit ACL update.
 
 **Unique**
 
@@ -442,7 +504,7 @@ docker run --rm --user $UID -v $(pwd)/schema:/data   \
 | `OPENLDAP_CTL_BACKUP_CONFIG_FILE_SUFFIX` | Suffix used for config backups                              | `-config.gz`                                                                                                                                                                     |
 | `OPENLDAP_CTL_BACKUP_DATA_FILE_SUFFIX`   | Suffix used for data backups                                | `-data.gz`                                                                                                                                                                       |
 | `OPENLDAP_CTL_PASSWORD_GENERATE_CMD`     | Command used by `openldap-ctl password generate`            | `slappasswd -n -g; slappasswd -g`                                                                                                                                                |
-| `OPENLDAP_CTL_PASSWORD_HASH_CMD`         | Command used by `openldap-ctl password hash`                | `slappasswd -h {ARGON2} -o module-path=${OPENLDAP_MODULES_DIR} -o module-load=argon2`                                                                                            |
+| `OPENLDAP_CTL_PASSWORD_HASH_CMD`         | Hash command accepting slappasswd options `-s` and `-T`     | `slappasswd -h {ARGON2} -o module-path=${OPENLDAP_MODULES_DIR} -o module-load=argon2`                                                                                            |
 | `OPENLDAP_CTL_SCHEMA2LDIF_DEPENDENCIES`  | Default schema dependencies for `schema2ldif`               | `core.schema cosine.schema inetorgperson.schema`                                                                                                                                 |
 | `OPENLDAP_CRON_JOB`                      | Cron job used by the backup service                         | `15 2 * * * PATH=${PATH} container run -- openldap-ctl backup "openldap-cron-$(date -I)-${OPENLDAP_VERSION}" --clean 15 --clean-prefix openldap-cron-` |
 | `OPENLDAP_UPGRADE_FORCE`                 | Allow upgrade bypasses, including forced downgrade handling | `false`                                                                                                                                                                          |

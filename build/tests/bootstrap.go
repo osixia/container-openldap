@@ -15,6 +15,15 @@ const replicationPassword = `Repl passw0rd 'single' \ $HOME`
 
 const defaultSchemas = "core.ldif cosine.ldif inetorgperson.ldif rfc2307bis.ldif"
 
+//go:embed testdata/templates.sh
+var templatesCheck string
+
+// ReadOnlyTemplates checks projected-volume sources and temporary-copy cleanup.
+func ReadOnlyTemplates(ctx context.Context, client *dagger.Client, image *dagger.Container) error {
+	_, err := expect(ctx, image, true, nil, "container", "run", "--", "bash", "-c", templatesCheck)
+	return err
+}
+
 // allSchemas can be loaded together. Excluded:
 //   - nis.ldif and virtualMail.ldif conflict with rfc2307bis.ldif and postfix-book.ldif,
 //     they are tested by AlternativeSchemas;
@@ -117,13 +126,14 @@ func AllFeatures(ctx context.Context, client *dagger.Client, image *dagger.Conta
 		"OPENLDAP_BOOTSTRAP_DATA_READONLY":                 "true",
 		"OPENLDAP_BOOTSTRAP_DATA_READONLY_PASSWORD_HASHED": hash,
 
-		"OPENLDAP_BOOTSTRAP_MONITOR_ENABLED":                  "true",
+		"OPENLDAP_BOOTSTRAP_MONITOR":                          "true",
 		"OPENLDAP_BOOTSTRAP_MONITOR_READONLY":                 "true",
 		"OPENLDAP_BOOTSTRAP_MONITOR_READONLY_PASSWORD_HASHED": hash,
 
 		"OPENLDAP_BOOTSTRAP_TLS":          "true",
 		"OPENLDAP_BOOTSTRAP_TLS_REQUIRED": "true",
 
+		"OPENLDAP_BOOTSTRAP_AUDITLOG": "true",
 		"OPENLDAP_BOOTSTRAP_REFINT":   "true",
 		"OPENLDAP_BOOTSTRAP_PPOLICY":  "true",
 		"OPENLDAP_BOOTSTRAP_UNIQUE":   "true",

@@ -25,7 +25,25 @@ if [ "${TYPE}" = "env" ]; then
     ensure_hashed_password OPENLDAP_BOOTSTRAP_CONFIG_ROOT_PASSWORD_HASHED "config root"
     ensure_hashed_password OPENLDAP_BOOTSTRAP_DATA_ROOT_PASSWORD_HASHED "database root"
 
-    for module in ${OPENLDAP_BOOTSTRAP_MODULES}; do
+    modules="${OPENLDAP_BOOTSTRAP_MODULES}"
+    if [ "${modules}" = "auto" ]; then
+        modules="back_mdb.so argon2.so"
+        declare -A auto_modules=(
+            [ppolicy]="${OPENLDAP_BOOTSTRAP_PPOLICY}"
+            [unique]="${OPENLDAP_BOOTSTRAP_UNIQUE}"
+            [refint]="${OPENLDAP_BOOTSTRAP_REFINT}"
+            [memberof]="${OPENLDAP_BOOTSTRAP_MEMBEROF}"
+            [auditlog]="${OPENLDAP_BOOTSTRAP_AUDITLOG}"
+            [syncprov]="${OPENLDAP_BOOTSTRAP_REPLICATION}"
+        )
+        for module in ppolicy unique refint memberof auditlog syncprov; do
+            if [ "${auto_modules[${module}]}" = "true" ]; then
+                modules+=" ${module}.so"
+            fi
+        done
+    fi
+
+    for module in ${modules}; do
         OPENLDAP_BOOTSTRAP_MODULES_LDIF+="olcModuleload: ${module}"$'\n'
     done
 
@@ -39,7 +57,8 @@ if [ "${TYPE}" = "env" ]; then
         OPENLDAP_BOOTSTRAP_SCHEMAS_LDIF+="include: file://${OPENLDAP_SCHEMAS_DIR}/${schema}"$'\n'
     done
 
-    OPENLDAP_BOOTSTRAP_MONITOR_ENABLED=${OPENLDAP_BOOTSTRAP_MONITOR_ENABLED^^}
+    OPENLDAP_BOOTSTRAP_MONITOR=${OPENLDAP_BOOTSTRAP_MONITOR^^}
+    OPENLDAP_BOOTSTRAP_DATA_LAST_BIND=${OPENLDAP_BOOTSTRAP_DATA_LAST_BIND^^}
 
     OPENLDAP_BOOTSTRAP_ORGANIZATION_DC=$(get_dn_attr dc "${OPENLDAP_BOOTSTRAP_SUFFIX}")
 
@@ -47,7 +66,7 @@ if [ "${TYPE}" = "env" ]; then
         container log fatal "OPENLDAP_BOOTSTRAP_SUFFIX must start with dc= (got ${OPENLDAP_BOOTSTRAP_SUFFIX})"
     fi
 
-    prepare_env_file "${ENV_FILE}" OPENLDAP_GROUP_GID OPENLDAP_USER_UID OPENLDAP_BOOTSTRAP_CONFIG_ROOT_PASSWORD_HASHED OPENLDAP_BOOTSTRAP_DATA_ROOT_PASSWORD_HASHED OPENLDAP_BOOTSTRAP_MODULES_LDIF OPENLDAP_BOOTSTRAP_SCHEMAS_LDIF OPENLDAP_BOOTSTRAP_MONITOR_ENABLED OPENLDAP_BOOTSTRAP_ORGANIZATION_DC
+    prepare_env_file "${ENV_FILE}" OPENLDAP_GROUP_GID OPENLDAP_USER_UID OPENLDAP_BOOTSTRAP_CONFIG_ROOT_PASSWORD_HASHED OPENLDAP_BOOTSTRAP_DATA_ROOT_PASSWORD_HASHED OPENLDAP_BOOTSTRAP_MODULES_LDIF OPENLDAP_BOOTSTRAP_SCHEMAS_LDIF OPENLDAP_BOOTSTRAP_MONITOR OPENLDAP_BOOTSTRAP_DATA_LAST_BIND OPENLDAP_BOOTSTRAP_ORGANIZATION_DC
 
 elif [ "${TYPE}" = "ldif" ]; then
     SOURCE_DIR="$2"

@@ -49,6 +49,9 @@ ok "anonymous users cannot read the database"
 for node in "${NODES[@]}"; do
     uri="$(ldaps_uri "${node}")"
 
+    expect_rc 0 bind_search "${uri}" "${CONFIG_ADMIN_DN}" -b "cn=config" '(olcDatabase=monitor)' olcMonitoring
+    expect_output '^olcMonitoring: TRUE$'
+
     expect_rc 0 bind_search "${uri}" "${CONFIG_ADMIN_DN}" -b "cn=module{0},cn=config" -s base olcModuleLoad
     for module in ${TEST_MODULES}; do
         expect_output "^olcModuleLoad: \{[0-9]+\}${module}$"
@@ -60,10 +63,10 @@ for node in "${NODES[@]}"; do
     done
 
     expect_rc 0 bind_search "${uri}" "${CONFIG_ADMIN_DN}" -b "olcDatabase={1}mdb,cn=config" -s one olcOverlay
-    for overlay in ppolicy unique refint memberof syncprov; do
+    for overlay in ppolicy unique refint memberof auditlog syncprov; do
         expect_output "^olcOverlay: \{[0-9]+\}${overlay}$"
     done
-    expect_output "^olcOverlay: \{4\}syncprov$"
+    expect_output "^olcOverlay: \{5\}syncprov$"
 
     expect_rc 0 bind_search "${uri}" "${CONFIG_ADMIN_DN}" -b "cn=config" -s base olcServerID
     if [ "$(grep -c "^olcServerID: " "${OUTPUT_FILE}")" != "${#NODES[@]}" ]; then

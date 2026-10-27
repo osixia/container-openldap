@@ -33,6 +33,9 @@ if [ "${OPENLDAP_BOOTSTRAP_DATA_READONLY}" = "true" ]; then
         OUTPUT_DIR="$3"
 
         prepare_ldif_files "${SOURCE_DIR}/database-readonly" "${OUTPUT_DIR}"
+        if [ "${OPENLDAP_BOOTSTRAP_PPOLICY}" = "true" ] && [ -f "${OUTPUT_DIR}/64-database-readonly-ppolicy-acl.ldif.optional" ]; then
+            mv "${OUTPUT_DIR}/64-database-readonly-ppolicy-acl.ldif.optional" "${OUTPUT_DIR}/64-database-readonly-ppolicy-acl.ldif"
+        fi
     fi
 
 fi

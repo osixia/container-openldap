@@ -1,0 +1,3 @@
+olcAccess: to attrs=pwdHistory
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_ADMIN_DN}" none
+  by * break

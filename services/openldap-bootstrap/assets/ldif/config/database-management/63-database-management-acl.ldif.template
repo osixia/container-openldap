@@ -1,0 +1,21 @@
+# Grant auth, write and password-administrator privileges, without hash read/compare.
+# Auth allows password changes carrying the old password (e.g. Authelia).
+# Manage allows ppolicy resets without knowing the old password.
+olcAccess: to dn.subtree="${OPENLDAP_BOOTSTRAP_DATA_TREE_USERS_DN}" attrs=userPassword
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_DN}" =wmx
+  by * break
+olcAccess: to attrs=${OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_HIDDEN_ATTRIBUTES}
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_DN}" none
+  by * break
+olcAccess: to dn.subtree="${OPENLDAP_BOOTSTRAP_DATA_TREE_USERS_DN}"
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_DN}" read
+  by * break
+olcAccess: to dn.subtree="${OPENLDAP_BOOTSTRAP_DATA_TREE_GROUPS_DN}"
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_DN}" read
+  by * break
+olcAccess: to dn.base="${OPENLDAP_BOOTSTRAP_SUFFIX}" attrs=entry,objectClass,o,dc
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_DN}" read
+  by * break
+olcAccess: to *
+  by dn.exact="${OPENLDAP_BOOTSTRAP_DATA_MANAGEMENT_DN}" none
+  by * break

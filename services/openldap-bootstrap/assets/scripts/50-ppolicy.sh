@@ -20,6 +20,24 @@ if [ "${OPENLDAP_BOOTSTRAP_PPOLICY}" = "true" ]; then
     if [ "${TYPE}" = "env" ]; then
         ENV_FILE="$2"
 
+        if [ "${OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MIN_DELAY}" -ne 0 ] || [ "${OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_DELAY}" -ne 0 ]; then
+            if [ "${OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MIN_DELAY}" -le 0 ] || [ "${OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_DELAY}" -lt "${OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MIN_DELAY}" ]; then
+                container log fatal "Password policy delays must satisfy 0 < OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MIN_DELAY <= OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_DELAY, or both must be 0"
+            fi
+            if [ "${OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT^^}" != "TRUE" ]; then
+                container log fatal "Password policy delays require OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT=true"
+            fi
+        fi
+
+        if [ "${OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_IDLE}" -gt 0 ]; then
+            if [ "${OPENLDAP_BOOTSTRAP_DATA_LAST_BIND^^}" != "TRUE" ]; then
+                container log fatal "OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_IDLE requires OPENLDAP_BOOTSTRAP_DATA_LAST_BIND=true"
+            fi
+            if [ "${OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT^^}" != "TRUE" ]; then
+                container log fatal "OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_MAX_IDLE requires OPENLDAP_BOOTSTRAP_PPOLICY_DEFAULT_LOCKOUT=true"
+            fi
+        fi
+
         OPENLDAP_BOOTSTRAP_PPOLICY_HASH_CLEAR_TEXT=${OPENLDAP_BOOTSTRAP_PPOLICY_HASH_CLEAR_TEXT^^}
         OPENLDAP_BOOTSTRAP_PPOLICY_USE_LOCKOUT=${OPENLDAP_BOOTSTRAP_PPOLICY_USE_LOCKOUT^^}
 
