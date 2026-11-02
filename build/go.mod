@@ -3,7 +3,7 @@ module github.com/osixia/container-openldap/build
 go 1.26.10
 
 require (
-	dagger.io/dagger v0.21.10
+	dagger.io/dagger v0.21.11
 	github.com/osixia/dagger-build v0.0.0-20261016204440-cdddcccbc11c
 )
 
