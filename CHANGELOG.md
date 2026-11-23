@@ -2,7 +2,7 @@
 
 Project-specific changes only. See upstream [OpenLDAP release notes](https://www.openldap.org/software/release/changes_lts.html).
 
-## Unreleased
+## 2.6.15
 
 ### Added
 
@@ -75,7 +75,7 @@ Project-specific changes only. See upstream [OpenLDAP release notes](https://www
 
 ### Documentation
 
-- Pin image examples to `osixia/openldap:2.6.15-rc` and quote the Quickstart
+- Pin image examples to `osixia/openldap:2.6.15` and quote the Quickstart
   password placeholder so the shell does not interpret it as redirections.
 - Align documentation with the renamed monitor and auditlog bootstrap flags.
 - Simplify LDIF validation documentation to one `docker exec` example, with support
